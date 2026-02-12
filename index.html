@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Will You Be My Valentine?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -13,14 +14,32 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(160deg, #fff0f5 0%, #ffe4ec 30%, #ffd6e0 60%, #fff5f7 100%);
-      font-family: 'Georgia', serif;
+      background: linear-gradient(160deg, #fff5f7 0%, #ffe8ef 30%, #ffd6e0 60%, #fff0f5 100%);
+      font-family: 'Quicksand', sans-serif;
       color: #5a3e4b;
       overflow-x: hidden;
       position: relative;
     }
 
-    /* Floating bunnies background */
+    /* Sparkle cursor trail */
+    .sparkle-trail {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff85a1;
+      box-shadow: 0 0 6px #ff85a1, 0 0 12px #ffc2d1;
+      animation: sparkleFade 0.6s ease-out forwards;
+    }
+
+    @keyframes sparkleFade {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0) translateY(-20px); opacity: 0; }
+    }
+
+    /* Floating bunnies */
     .floaters-bg {
       position: fixed;
       top: 0; left: 0;
@@ -36,7 +55,6 @@
       animation: floatUp linear infinite;
     }
 
-    /* CSS Bunny shape */
     .mini-bunny {
       position: relative;
       width: 24px;
@@ -73,9 +91,9 @@
 
     @keyframes floatUp {
       0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10%  { opacity: 0.5; }
-      90%  { opacity: 0.5; }
-      100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+      10%  { opacity: 0.45; }
+      90%  { opacity: 0.45; }
+      100% { transform: translateY(-110vh) rotate(15deg); opacity: 0; }
     }
 
     /* Soft orbs */
@@ -83,7 +101,7 @@
       position: fixed;
       border-radius: 50%;
       filter: blur(100px);
-      opacity: 0.2;
+      opacity: 0.18;
       z-index: 0;
       animation: drift 14s ease-in-out infinite alternate;
     }
@@ -91,6 +109,7 @@
     .orb-1 { width: 400px; height: 400px; background: #ffb6c1; top: -100px; left: -100px; }
     .orb-2 { width: 350px; height: 350px; background: #98d4a2; bottom: -80px; right: -80px; animation-delay: -5s; }
     .orb-3 { width: 250px; height: 250px; background: #ffc2d1; top: 30%; left: 55%; animation-delay: -9s; }
+    .orb-4 { width: 200px; height: 200px; background: #c9e8cd; top: 60%; right: 20%; animation-delay: -7s; }
 
     @keyframes drift {
       to { transform: translate(50px, 30px); }
@@ -104,7 +123,7 @@
       padding: 2rem;
     }
 
-    /* Keroppi CSS character */
+    /* Keroppi */
     .keroppi {
       position: relative;
       width: 100px;
@@ -189,13 +208,20 @@
       70%      { transform: translateY(-8px); }
     }
 
-    /* Big bunny character */
+    /* Big bunny */
     .bunny {
       position: relative;
       width: 120px;
       height: 150px;
-      margin: 1rem auto;
+      margin: 0.5rem auto;
       animation: bunnyBounce 1.2s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    .bunny:hover .bunny-cheek-l,
+    .bunny:hover .bunny-cheek-r {
+      opacity: 1;
+      transform: scale(1.3);
     }
 
     .bunny-head {
@@ -287,6 +313,7 @@
       border-radius: 50%;
       bottom: 28px;
       opacity: 0.6;
+      transition: all 0.3s;
     }
 
     .bunny-cheek-l { left: 14px; }
@@ -298,16 +325,17 @@
     }
 
     h1 {
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      font-weight: normal;
-      margin-bottom: 0.5rem;
+      font-family: 'Caveat', cursive;
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
       background: linear-gradient(135deg, #ff758f, #ff4d6d, #ff85a1, #ffc2d1);
       background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: shimmer 4s ease-in-out infinite;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
     }
 
     @keyframes shimmer {
@@ -316,9 +344,10 @@
     }
 
     .subtitle {
-      font-size: clamp(1rem, 3vw, 1.3rem);
-      color: #b07a8a;
-      margin-bottom: 2.5rem;
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #c47a90;
+      margin-bottom: 2rem;
       opacity: 0;
       animation: fadeInUp 1s ease forwards 0.5s;
       line-height: 1.6;
@@ -341,13 +370,13 @@
     }
 
     .btn-yes {
-      padding: 16px 48px;
+      padding: 16px 52px;
       background: linear-gradient(135deg, #ff85a1, #ff4d6d);
       color: #fff;
       border: none;
       border-radius: 50px;
-      font-family: 'Georgia', serif;
-      font-size: 1.3rem;
+      font-family: 'Caveat', cursive;
+      font-size: 1.5rem;
       cursor: pointer;
       letter-spacing: 1px;
       transition: all 0.3s ease;
@@ -365,10 +394,9 @@
       color: #b07a8a;
       border: 2px solid #e8b4c8;
       border-radius: 50px;
-      font-family: 'Georgia', serif;
-      font-size: 1rem;
+      font-family: 'Caveat', cursive;
+      font-size: 1.2rem;
       cursor: pointer;
-      letter-spacing: 1px;
       transition: all 0.2s ease;
     }
 
@@ -378,7 +406,7 @@
       top: 1.2rem;
       right: 1.2rem;
       z-index: 500;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       border: 2px solid #e8b4c8;
       border-radius: 50%;
       width: 44px;
@@ -393,10 +421,7 @@
       color: #ff85a1;
     }
 
-    .music-toggle:hover {
-      transform: scale(1.1);
-      background: #fff;
-    }
+    .music-toggle:hover { transform: scale(1.1); background: #fff; }
 
     /* Yes response */
     .yes-screen {
@@ -404,7 +429,7 @@
       text-align: center;
       width: 100%;
       max-width: 1200px;
-      padding: 2rem;
+      padding: 2rem 1rem;
     }
 
     .yes-screen.active {
@@ -412,82 +437,151 @@
       animation: fadeInUp 0.8s ease forwards;
     }
 
-    .yes-bunny-text {
-      font-size: 60px;
-      display: inline-block;
-      animation: bunnyBounce 0.8s ease-in-out infinite;
-    }
-
     .yes-text {
-      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-family: 'Caveat', cursive;
+      font-size: clamp(2rem, 6vw, 3.5rem);
       background: linear-gradient(135deg, #ff758f, #ffc2d1, #ff4d6d);
       background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: shimmer 3s ease-in-out infinite;
-      margin-top: 1rem;
-      line-height: 1.5;
+      margin-top: 0.5rem;
+      line-height: 1.4;
     }
 
     .yes-sub {
-      color: #b07a8a;
-      font-size: clamp(1rem, 2.5vw, 1.2rem);
-      margin-top: 1rem;
-      font-style: italic;
+      font-family: 'Caveat', cursive;
+      color: #c47a90;
+      font-size: clamp(1.2rem, 3vw, 1.5rem);
+      margin-top: 0.8rem;
     }
 
-    /* Photo gallery */
-    .gallery-title {
-      font-size: clamp(1.2rem, 3vw, 1.8rem);
+    /* Love notes section */
+    .love-notes {
+      margin: 3rem auto 2rem;
+      max-width: 700px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      padding: 0 1rem;
+    }
+
+    .love-note {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem 1.2rem;
+      font-family: 'Caveat', cursive;
+      font-size: 1.2rem;
+      color: #7a4a5a;
+      box-shadow: 0 4px 16px rgba(180, 120, 140, 0.12);
+      transform: rotate(var(--rot, -2deg));
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      animation: noteIn 0.5s ease forwards;
+      position: relative;
+      line-height: 1.4;
+    }
+
+    .love-note::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 14px;
+      background: rgba(255, 182, 193, 0.5);
+      border-radius: 2px;
+    }
+
+    .love-note:hover {
+      transform: rotate(0deg) scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 133, 161, 0.25);
+    }
+
+    @keyframes noteIn {
+      from { opacity: 0; transform: rotate(var(--rot, -2deg)) translateY(20px) scale(0.9); }
+      to { opacity: 1; transform: rotate(var(--rot, -2deg)) translateY(0) scale(1); }
+    }
+
+    .love-notes-title {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
       color: #ff85a1;
-      margin: 3rem 0 0.5rem;
-      letter-spacing: 2px;
+      margin-bottom: 0.3rem;
+      letter-spacing: 1px;
+    }
+
+    .love-notes-sub {
+      font-family: 'Caveat', cursive;
+      color: #c47a90;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Photo gallery - Polaroid style */
+    .gallery-title {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      color: #ff85a1;
+      margin: 2rem 0 0.3rem;
+      letter-spacing: 1px;
     }
 
     .gallery-sub {
-      color: #b07a8a;
-      font-size: 0.95rem;
+      font-family: 'Caveat', cursive;
+      color: #c47a90;
+      font-size: 1.1rem;
       margin-bottom: 1.5rem;
-      font-style: italic;
     }
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2rem;
       width: 100%;
-      padding: 0 1rem;
+      padding: 0 1rem 3rem;
     }
 
-    .gallery-item {
-      position: relative;
-      border-radius: 20px;
-      overflow: hidden;
-      aspect-ratio: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(180, 120, 140, 0.2);
+    .polaroid {
+      background: #fff;
+      border-radius: 4px;
+      padding: 12px 12px 0 12px;
+      box-shadow: 0 4px 20px rgba(180, 120, 140, 0.15);
+      transform: rotate(var(--rot, 0deg));
       transition: transform 0.4s ease, box-shadow 0.4s ease;
+      cursor: pointer;
       opacity: 0;
-      animation: photoFadeIn 0.6s ease forwards;
-      border: 3px solid rgba(255, 255, 255, 0.8);
+      animation: polaroidIn 0.6s ease forwards;
     }
 
-    .gallery-item:hover {
-      transform: scale(1.03) rotate(-1deg);
-      box-shadow: 0 8px 35px rgba(255, 133, 161, 0.35);
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.04) translateY(-5px);
+      box-shadow: 0 12px 35px rgba(255, 133, 161, 0.3);
     }
 
-    .gallery-item img {
+    .polaroid img {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 1;
       object-fit: cover;
       display: block;
+      border-radius: 2px;
     }
 
-    @keyframes photoFadeIn {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
+    .polaroid-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: #7a4a5a;
+      padding: 10px 4px 14px;
+      text-align: center;
+      min-height: 44px;
+      line-height: 1.3;
+    }
+
+    @keyframes polaroidIn {
+      from { opacity: 0; transform: rotate(var(--rot, 0deg)) translateY(40px) scale(0.9); }
+      to { opacity: 1; transform: rotate(var(--rot, 0deg)) translateY(0) scale(1); }
     }
 
     /* Lightbox */
@@ -504,20 +598,28 @@
       backdrop-filter: blur(5px);
     }
 
-    .lightbox.active { display: flex; }
+    .lightbox.active { display: flex; flex-direction: column; }
 
     .lightbox img {
       max-width: 90vw;
-      max-height: 85vh;
-      border-radius: 16px;
+      max-height: 75vh;
+      border-radius: 8px;
       box-shadow: 0 0 60px rgba(255, 133, 161, 0.3);
       animation: lightboxIn 0.3s ease;
-      border: 4px solid rgba(255, 255, 255, 0.5);
+      border: 6px solid #fff;
+    }
+
+    .lightbox-caption {
+      font-family: 'Caveat', cursive;
+      color: #ffc2d1;
+      font-size: 1.4rem;
+      margin-top: 1rem;
+      text-align: center;
     }
 
     @keyframes lightboxIn {
       from { transform: scale(0.8); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .lightbox-close {
@@ -562,51 +664,50 @@
     /* Scroll hint */
     .scroll-hint {
       margin-top: 2rem;
-      color: #b07a8a;
-      font-size: 0.9rem;
+      color: #c47a90;
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
       animation: bounce 2s ease-in-out infinite;
     }
 
-    .scroll-hint span { display: block; font-size: 1.5rem; }
+    .scroll-hint span { display: block; font-size: 1.8rem; }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50%      { transform: translateY(8px); }
     }
 
-    /* Paw prints decoration */
-    .paw-trail {
-      position: fixed;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.08;
-      font-size: 30px;
-      color: #ff85a1;
+    /* Divider */
+    .cute-divider {
+      margin: 1rem auto;
+      font-family: 'Caveat', cursive;
+      color: #e8b4c8;
+      font-size: 1.5rem;
+      letter-spacing: 8px;
     }
 
     @media (max-width: 600px) {
       .gallery {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 1rem;
+      }
+      .love-notes {
+        grid-template-columns: 1fr;
       }
       .keroppi { transform: scale(0.8); }
       .bunny { transform: scale(0.85); }
+      .polaroid { padding: 8px 8px 0 8px; }
+      .polaroid-caption { font-size: 0.95rem; padding: 8px 2px 10px; }
     }
   </style>
 </head>
 <body>
-  <!-- Ambient orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
-
-  <!-- Floating bunnies -->
+  <div class="orb orb-4"></div>
   <div class="floaters-bg" id="floatersBg"></div>
-
-  <!-- Confetti -->
   <canvas id="confetti"></canvas>
-
-  <!-- Music toggle -->
   <button class="music-toggle" id="musicToggle" title="Toggle music">&#9835;</button>
 
   <!-- Lightbox -->
@@ -615,11 +716,11 @@
     <div class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">&#10094;</div>
     <div class="lightbox-nav lightbox-next" onclick="navLightbox(1)">&#10095;</div>
     <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
   </div>
 
   <!-- Ask screen -->
   <div class="content" id="askScreen">
-    <!-- Keroppi -->
     <div class="keroppi">
       <div class="keroppi-body">
         <div class="keroppi-eye-l"><div class="keroppi-pupil-l"></div></div>
@@ -630,7 +731,6 @@
       </div>
     </div>
 
-    <!-- Bunny -->
     <div class="bunny">
       <div class="bunny-head">
         <div class="bunny-ear-l"></div>
@@ -647,17 +747,17 @@
     </div>
 
     <h1>Will You Be My Valentine?</h1>
-    <p class="subtitle">I'll share my carrots with you... every single one.</p>
+    <p class="subtitle">I like you more than carrots... and that's saying a lot.</p>
 
     <div class="buttons">
-      <button class="btn-yes" id="yesBtn" onclick="sayYes()">Yes!</button>
+      <button class="btn-yes" id="yesBtn" onclick="sayYes()">Yes please!</button>
       <button class="btn-no" id="noBtn">No</button>
     </div>
   </div>
 
-  <!-- Yes response screen -->
+  <!-- Yes response -->
   <div class="content yes-screen" id="yesScreen">
-    <div class="keroppi" style="margin-bottom:1rem">
+    <div class="keroppi" style="margin-bottom:0.5rem">
       <div class="keroppi-body">
         <div class="keroppi-eye-l"><div class="keroppi-pupil-l"></div></div>
         <div class="keroppi-eye-r"><div class="keroppi-pupil-r"></div></div>
@@ -666,16 +766,26 @@
         <div class="keroppi-cheek-r"></div>
       </div>
     </div>
-    <div class="yes-text">Yay!! You made me<br>the happiest bunny ever!</div>
-    <div class="yes-sub">Now we're officially valentines, hop hop!</div>
+
+    <div class="yes-text">You said yes!!<br>I'm the luckiest bunny alive</div>
+    <div class="yes-sub">okay but fr you just made my whole year</div>
 
     <div class="scroll-hint">
       <span>&#x2193;</span>
-      Scroll down to see our memories
+      keep scrolling, it gets cuter
     </div>
 
-    <p class="gallery-title">Our Favorite Moments Together</p>
-    <p class="gallery-sub">every picture tells our story</p>
+    <!-- Love notes -->
+    <div class="cute-divider">~ ~ ~</div>
+    <p class="love-notes-title">Things I Love About You</p>
+    <p class="love-notes-sub">a very incomplete list</p>
+
+    <div class="love-notes" id="loveNotes"></div>
+
+    <!-- Photo gallery -->
+    <div class="cute-divider">~ ~ ~</div>
+    <p class="gallery-title">Us Being Cute Together</p>
+    <p class="gallery-sub">every single one is my favorite</p>
 
     <div class="gallery" id="gallery"></div>
   </div>
@@ -690,65 +800,90 @@
     let audioCtx = null;
 
     const photos = [
-      'images/IMG_0669.JPG',
-      'images/IMG_2442.JPG',
-      'images/IMG_2453.jpg',
-      'images/IMG_2460.jpg',
-      'images/IMG_2464.jpg',
-      'images/IMG_2970.jpg',
-      'images/IMG_3044.jpg',
-      'images/IMG_3102.jpg',
-      'images/IMG_3205.jpg',
-      'images/IMG_3515.jpg',
-      'images/IMG_3555.jpg',
-      'images/IMG_4379.jpg',
-      'images/IMG_4867.jpg',
-      'images/IMG_5163.jpg',
-      'images/IMG_5475.jpg',
-      'images/IMG_7189.jpg',
-      'images/IMG_7642.jpg',
-      'images/IMG_7683.jpg',
-      'images/IMG_7698.jpg',
-      'images/IMG_7762.jpg',
-      'images/IMG_7800.jpg',
-      'images/IMG_8149.jpg',
-      'images/IMG_8703.jpg',
-      'images/IMG_8716.jpg',
-      'images/IMG_8866.jpg',
-      'images/IMG_9324.jpg',
-      'images/SAM_1908.JPG',
-      'images/3A97D64F.jpg',
-      'images/RenderedImage.jpg',
+      'images/IMG_0669.JPG', 'images/IMG_2442.JPG', 'images/IMG_2453.jpg',
+      'images/IMG_2460.jpg', 'images/IMG_2464.jpg', 'images/IMG_2970.jpg',
+      'images/IMG_3044.jpg', 'images/IMG_3102.jpg', 'images/IMG_3205.jpg',
+      'images/IMG_3515.jpg', 'images/IMG_3555.jpg', 'images/IMG_4379.jpg',
+      'images/IMG_4867.jpg', 'images/IMG_5163.jpg', 'images/IMG_5475.jpg',
+      'images/IMG_7189.jpg', 'images/IMG_7642.jpg', 'images/IMG_7683.jpg',
+      'images/IMG_7698.jpg', 'images/IMG_7762.jpg', 'images/IMG_7800.jpg',
+      'images/IMG_8149.jpg', 'images/IMG_8703.jpg', 'images/IMG_8716.jpg',
+      'images/IMG_8866.jpg', 'images/IMG_9324.jpg', 'images/SAM_1908.JPG',
+      'images/3A97D64F.jpg', 'images/RenderedImage.jpg',
     ];
 
-    for (let i = photos.length - 1; i > 0; i--) {
+    // Cute captions for polaroids
+    const captions = [
+      "you + me = everything",
+      "my favorite hello",
+      "you make me smile like this",
+      "this is my happy place",
+      "us being us",
+      "you're my person",
+      "still can't believe you're mine",
+      "main character energy, both of us",
+      "10/10 would do life with you",
+      "the way you look at me tho",
+      "my heart goes brrr",
+      "certified cuties",
+      "you had me at hello",
+      "together is my favorite place",
+      "falling for you, still",
+      "you're stuck with me now",
+      "the best plot twist in my life",
+      "we're that couple and I love it",
+      "you make boring fun",
+      "my forever plus one",
+      "I like your face a lot",
+      "can we stay like this forever",
+      "you're the reason I smile",
+      "lucky me, lucky us",
+      "my whole heart, right here",
+      "I'd choose you every time",
+      "home is wherever you are",
+      "we just make sense",
+      "the cutest memory",
+    ];
+
+    const loveNoteTexts = [
+      "The way you laugh at my terrible jokes like they're actually funny",
+      "How you always know exactly what I need before I even say it",
+      "Your smile literally makes everything better, it's unfair",
+      "The fact that you put up with my chaos and still choose me every day",
+      "How safe I feel when I'm with you, like nothing else matters",
+      "Your voice when you're sleepy... it does things to my heart",
+      "The way you hold my hand like you never want to let go",
+      "How you make even the most boring days feel like an adventure",
+    ];
+
+    // Shuffle photos + captions together
+    const paired = photos.map((p, i) => ({ photo: p, caption: captions[i % captions.length] }));
+    for (let i = paired.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [photos[i], photos[j]] = [photos[j], photos[i]];
+      [paired[i], paired[j]] = [paired[j], paired[i]];
     }
 
     const noMessages = [
       'No',
-      'Are you sure?',
-      'Really sure?',
-      'Think again!',
-      'Pls?',
-      'Pretty pls?',
-      "I'll be sad...",
-      "I'll cry...",
-      'You\'re breaking my heart',
-      'I\'m already crying',
-      'Ok fine... just kidding, pls?',
+      'wait... really?',
+      'are you sure about that?',
+      'think about it...',
+      'pretty please?',
+      'with a cherry on top?',
+      'i\'ll share my fries...',
+      'i\'ll let you pick the movie...',
+      'you\'re really doing this to me',
+      'my bunny heart is breaking',
+      'ok last chance... pls?',
     ];
 
-    // No button runs away
+    // No button
     noBtn.addEventListener('click', () => {
       noCount++;
       noBtn.textContent = noMessages[Math.min(noCount, noMessages.length - 1)];
-      const noScale = Math.max(0.4, 1 - noCount * 0.08);
-      noBtn.style.transform = `scale(${noScale})`;
-      const yesScale = 1 + noCount * 0.15;
-      yesBtn.style.transform = `scale(${yesScale})`;
-      yesBtn.style.fontSize = `${1.3 + noCount * 0.1}rem`;
+      noBtn.style.transform = `scale(${Math.max(0.4, 1 - noCount * 0.08)})`;
+      yesBtn.style.transform = `scale(${1 + noCount * 0.15})`;
+      yesBtn.style.fontSize = `${1.5 + noCount * 0.12}rem`;
       const maxX = window.innerWidth - noBtn.offsetWidth - 40;
       const maxY = window.innerHeight - noBtn.offsetHeight - 40;
       noBtn.style.position = 'fixed';
@@ -757,7 +892,6 @@
       noBtn.style.zIndex = '100';
     });
 
-    // YES!
     function sayYes() {
       document.getElementById('askScreen').style.display = 'none';
       noBtn.style.display = 'none';
@@ -765,26 +899,47 @@
       document.getElementById('yesScreen').classList.add('active');
       for (let i = 0; i < 30; i++) setTimeout(() => createFloater(), i * 80);
       launchConfetti();
+      buildLoveNotes();
       buildGallery();
     }
 
-    // Gallery
+    // Love notes
+    function buildLoveNotes() {
+      const container = document.getElementById('loveNotes');
+      loveNoteTexts.forEach((text, i) => {
+        const note = document.createElement('div');
+        note.classList.add('love-note');
+        const rot = (Math.random() - 0.5) * 6;
+        note.style.setProperty('--rot', `${rot}deg`);
+        note.style.animationDelay = `${i * 0.12}s`;
+        note.textContent = text;
+        container.appendChild(note);
+      });
+    }
+
+    // Polaroid gallery
     function buildGallery() {
       const gallery = document.getElementById('gallery');
-      photos.forEach((src, i) => {
-        const item = document.createElement('div');
-        item.classList.add('gallery-item');
-        item.style.animationDelay = `${i * 0.08}s`;
-        item.innerHTML = `<img src="${src}" alt="Our memory" loading="lazy">`;
-        item.addEventListener('click', () => openLightbox(i));
-        gallery.appendChild(item);
+      paired.forEach(({ photo, caption }, i) => {
+        const pol = document.createElement('div');
+        pol.classList.add('polaroid');
+        const rot = (Math.random() - 0.5) * 5;
+        pol.style.setProperty('--rot', `${rot}deg`);
+        pol.style.animationDelay = `${i * 0.08}s`;
+        pol.innerHTML = `
+          <img src="${photo}" alt="Our memory" loading="lazy">
+          <div class="polaroid-caption">${caption}</div>
+        `;
+        pol.addEventListener('click', () => openLightbox(i));
+        gallery.appendChild(pol);
       });
     }
 
     // Lightbox
     function openLightbox(index) {
       currentLightboxIndex = index;
-      document.getElementById('lightboxImg').src = photos[index];
+      document.getElementById('lightboxImg').src = paired[index].photo;
+      document.getElementById('lightboxCaption').textContent = paired[index].caption;
       document.getElementById('lightbox').classList.add('active');
     }
 
@@ -794,8 +949,9 @@
 
     function navLightbox(dir) {
       event.stopPropagation();
-      currentLightboxIndex = (currentLightboxIndex + dir + photos.length) % photos.length;
-      document.getElementById('lightboxImg').src = photos[currentLightboxIndex];
+      currentLightboxIndex = (currentLightboxIndex + dir + paired.length) % paired.length;
+      document.getElementById('lightboxImg').src = paired[currentLightboxIndex].photo;
+      document.getElementById('lightboxCaption').textContent = paired[currentLightboxIndex].caption;
     }
 
     document.getElementById('lightbox').addEventListener('click', (e) => {
@@ -809,28 +965,40 @@
       if (e.key === 'ArrowRight') navLightbox(1);
     });
 
-    // Floating mini bunnies (CSS, no emoji)
+    // Floating bunnies
     function createFloater() {
       const wrapper = document.createElement('div');
       wrapper.classList.add('floating-bunny');
-      const size = 0.6 + Math.random() * 0.8;
+      const size = 0.5 + Math.random() * 0.7;
       wrapper.style.left = Math.random() * 100 + '%';
       wrapper.style.animationDuration = (10 + Math.random() * 12) + 's';
       wrapper.style.transform = `scale(${size})`;
-      wrapper.innerHTML = `
-        <div class="mini-bunny">
-          <div class="ear-inner-l"></div>
-          <div class="ear-inner-r"></div>
-        </div>
-      `;
+      wrapper.innerHTML = `<div class="mini-bunny"><div class="ear-inner-l"></div><div class="ear-inner-r"></div></div>`;
       floatersBg.appendChild(wrapper);
       setTimeout(() => wrapper.remove(), 22000);
     }
 
-    for (let i = 0; i < 8; i++) setTimeout(() => createFloater(), i * 600);
-    setInterval(createFloater, 2000);
+    for (let i = 0; i < 6; i++) setTimeout(() => createFloater(), i * 700);
+    setInterval(createFloater, 2500);
 
-    // Confetti (pastel bunny colors)
+    // Sparkle cursor trail
+    let lastSparkle = 0;
+    document.addEventListener('mousemove', (e) => {
+      const now = Date.now();
+      if (now - lastSparkle < 50) return;
+      lastSparkle = now;
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle-trail');
+      sparkle.style.left = e.clientX + (Math.random() - 0.5) * 10 + 'px';
+      sparkle.style.top = e.clientY + (Math.random() - 0.5) * 10 + 'px';
+      const size = 3 + Math.random() * 5;
+      sparkle.style.width = size + 'px';
+      sparkle.style.height = size + 'px';
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 600);
+    });
+
+    // Confetti
     function launchConfetti() {
       const canvas = document.getElementById('confetti');
       const ctx = canvas.getContext('2d');
@@ -838,14 +1006,14 @@
       canvas.height = window.innerHeight;
       const pieces = [];
       const colors = ['#ffb6c1', '#ffc2d1', '#ffd6e0', '#98d4a2', '#b8e6be', '#fff', '#ff85a1', '#ffe4ec'];
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 250; i++) {
         pieces.push({
           x: canvas.width / 2, y: canvas.height / 2,
-          vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20 - 5,
-          w: 6 + Math.random() * 8, h: 4 + Math.random() * 6,
+          vx: (Math.random() - 0.5) * 24, vy: (Math.random() - 0.5) * 24 - 6,
+          w: 5 + Math.random() * 8, h: 3 + Math.random() * 6,
           color: colors[Math.floor(Math.random() * colors.length)],
           rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15,
-          gravity: 0.15 + Math.random() * 0.1, opacity: 1,
+          gravity: 0.12 + Math.random() * 0.1, opacity: 1,
         });
       }
       function animate() {
@@ -853,7 +1021,7 @@
         let alive = false;
         for (const p of pieces) {
           p.vy += p.gravity; p.x += p.vx; p.y += p.vy;
-          p.rot += p.rotSpeed; p.vx *= 0.99; p.opacity -= 0.003;
+          p.rot += p.rotSpeed; p.vx *= 0.99; p.opacity -= 0.0025;
           if (p.opacity <= 0) continue;
           alive = true;
           ctx.save();
@@ -869,138 +1037,89 @@
       animate();
     }
 
-    // Click to burst mini paw prints
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-yes') || e.target.closest('.btn-no') || e.target.closest('.lightbox') || e.target.closest('.gallery-item') || e.target.closest('.music-toggle')) return;
-      for (let i = 0; i < 4; i++) {
-        const paw = document.createElement('div');
-        paw.textContent = '\u2022';
-        paw.style.cssText = `
-          position: fixed; left: ${e.clientX}px; top: ${e.clientY}px;
-          font-size: ${16 + Math.random() * 14}px; pointer-events: none;
-          z-index: 999; opacity: 1; color: #ffb6c1; font-family: serif;
-          transition: all ${0.5 + Math.random() * 0.6}s ease-out;
-        `;
-        document.body.appendChild(paw);
-        requestAnimationFrame(() => {
-          paw.style.transform = `translate(${(Math.random() - 0.5) * 100}px, ${-50 - Math.random() * 80}px)`;
-          paw.style.opacity = '0';
-        });
-        setTimeout(() => paw.remove(), 1200);
-      }
-    });
-
     window.addEventListener('resize', () => {
-      const canvas = document.getElementById('confetti');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const c = document.getElementById('confetti');
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
     });
 
-    // ---- Music Box Melody (Web Audio API) ----
+    // Music Box
     let musicInterval = null;
     let gainNode = null;
 
     function startMusic() {
       if (audioCtx) { audioCtx.resume(); musicPlaying = true; updateMusicBtn(); return; }
-
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.12;
+      gainNode.gain.value = 0.1;
       gainNode.connect(audioCtx.destination);
 
-      // Cute music box melody - pentatonic happy tune
       const melody = [
-        // Bar 1
         { note: 'E5', dur: 0.25 }, { note: 'G5', dur: 0.25 },
         { note: 'A5', dur: 0.5 },  { note: 'G5', dur: 0.25 },
         { note: 'E5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
-        // Bar 2
         { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.25 },
         { note: 'E5', dur: 0.5 },  { note: 'G5', dur: 0.25 },
         { note: 'E5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
-        // Bar 3
         { note: 'E5', dur: 0.25 }, { note: 'G5', dur: 0.25 },
         { note: 'A5', dur: 0.25 }, { note: 'B5', dur: 0.25 },
         { note: 'A5', dur: 0.5 },  { note: 'G5', dur: 0.5 },
-        // Bar 4
         { note: 'E5', dur: 0.25 }, { note: 'D5', dur: 0.25 },
-        { note: 'C5', dur: 0.75 }, { note: 'REST', dur: 0.25 },
-        { note: 'REST', dur: 0.5 },
-        // Bar 5
+        { note: 'C5', dur: 0.75 }, { note: 'R', dur: 0.75 },
         { note: 'C5', dur: 0.25 }, { note: 'E5', dur: 0.25 },
         { note: 'G5', dur: 0.5 },  { note: 'A5', dur: 0.25 },
         { note: 'G5', dur: 0.25 }, { note: 'E5', dur: 0.5 },
-        // Bar 6
         { note: 'D5', dur: 0.25 }, { note: 'E5', dur: 0.25 },
         { note: 'G5', dur: 0.5 },  { note: 'E5', dur: 0.25 },
         { note: 'D5', dur: 0.25 }, { note: 'C5', dur: 0.5 },
-        // Bar 7
         { note: 'A4', dur: 0.25 }, { note: 'C5', dur: 0.25 },
         { note: 'E5', dur: 0.5 },  { note: 'D5', dur: 0.25 },
         { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
-        // Bar 8
         { note: 'E5', dur: 0.25 }, { note: 'G5', dur: 0.25 },
-        { note: 'A5', dur: 0.75 }, { note: 'REST', dur: 0.25 },
-        { note: 'REST', dur: 0.5 },
+        { note: 'A5', dur: 0.75 }, { note: 'R', dur: 0.75 },
       ];
 
-      const noteFreqs = {
-        'A4': 440.00, 'B4': 493.88, 'C5': 523.25, 'D5': 587.33,
-        'E5': 659.26, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77,
+      const freq = {
+        'A4': 440, 'C5': 523.25, 'D5': 587.33,
+        'E5': 659.26, 'G5': 783.99, 'A5': 880, 'B5': 987.77,
       };
+      const tempo = 0.3;
 
-      const tempo = 0.32; // seconds per beat unit
-
-      function playMelody() {
-        let time = audioCtx.currentTime + 0.05;
-
+      function play() {
+        let t = audioCtx.currentTime + 0.05;
         melody.forEach(({ note, dur }) => {
-          const duration = dur * tempo;
-          if (note !== 'REST') {
-            // Main tone (music box = sine with quick decay)
-            const osc = audioCtx.createOscillator();
-            const env = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = noteFreqs[note];
-            env.gain.setValueAtTime(0.6, time);
-            env.gain.exponentialRampToValueAtTime(0.01, time + duration * 2.5);
-            osc.connect(env);
-            env.connect(gainNode);
-            osc.start(time);
-            osc.stop(time + duration * 3);
+          const d = dur * tempo;
+          if (note !== 'R') {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sine';
+            o.frequency.value = freq[note];
+            g.gain.setValueAtTime(0.5, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + d * 2.5);
+            o.connect(g); g.connect(gainNode);
+            o.start(t); o.stop(t + d * 3);
 
-            // Shimmer overtone
-            const osc2 = audioCtx.createOscillator();
-            const env2 = audioCtx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.value = noteFreqs[note] * 3;
-            env2.gain.setValueAtTime(0.08, time);
-            env2.gain.exponentialRampToValueAtTime(0.001, time + duration * 1.5);
-            osc2.connect(env2);
-            env2.connect(gainNode);
-            osc2.start(time);
-            osc2.stop(time + duration * 2);
+            const o2 = audioCtx.createOscillator();
+            const g2 = audioCtx.createGain();
+            o2.type = 'sine';
+            o2.frequency.value = freq[note] * 3;
+            g2.gain.setValueAtTime(0.06, t);
+            g2.gain.exponentialRampToValueAtTime(0.001, t + d * 1.5);
+            o2.connect(g2); g2.connect(gainNode);
+            o2.start(t); o2.stop(t + d * 2);
           }
-          time += duration;
+          t += d;
         });
-
-        return time - audioCtx.currentTime;
+        return t - audioCtx.currentTime;
       }
 
-      const loopDuration = playMelody();
-      musicInterval = setInterval(() => {
-        if (musicPlaying) playMelody();
-      }, loopDuration * 1000);
-
+      const dur = play();
+      musicInterval = setInterval(() => { if (musicPlaying) play(); }, dur * 1000);
       musicPlaying = true;
       updateMusicBtn();
     }
 
-    function stopMusic() {
-      if (audioCtx) audioCtx.suspend();
-      musicPlaying = false;
-      updateMusicBtn();
-    }
+    function stopMusic() { if (audioCtx) audioCtx.suspend(); musicPlaying = false; updateMusicBtn(); }
 
     function updateMusicBtn() {
       document.getElementById('musicToggle').innerHTML = musicPlaying ? '&#9835;' : '&#9834;';
@@ -1008,17 +1127,12 @@
     }
 
     document.getElementById('musicToggle').addEventListener('click', () => {
-      if (musicPlaying) stopMusic();
-      else startMusic();
+      musicPlaying ? stopMusic() : startMusic();
     });
 
-    // Auto-start music on first interaction
     let musicStarted = false;
     document.addEventListener('click', () => {
-      if (!musicStarted) {
-        musicStarted = true;
-        startMusic();
-      }
+      if (!musicStarted) { musicStarted = true; startMusic(); }
     }, { once: false });
   </script>
 </body>
