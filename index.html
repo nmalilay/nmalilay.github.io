@@ -16,7 +16,7 @@
       background: linear-gradient(135deg, #1a0a1e 0%, #2d1035 40%, #3b1044 70%, #1a0a1e 100%);
       font-family: 'Georgia', serif;
       color: #f8e0f0;
-      overflow: hidden;
+      overflow-x: hidden;
       position: relative;
     }
 
@@ -193,6 +193,9 @@
     .yes-screen {
       display: none;
       text-align: center;
+      width: 100%;
+      max-width: 1200px;
+      padding: 2rem;
     }
 
     .yes-screen.active {
@@ -201,7 +204,7 @@
     }
 
     .yes-heart {
-      font-size: 150px;
+      font-size: 120px;
       display: inline-block;
       animation: yesHeartbeat 0.6s ease-in-out infinite;
       filter: drop-shadow(0 0 40px rgba(255, 77, 109, 0.8));
@@ -231,6 +234,128 @@
       font-style: italic;
     }
 
+    /* Photo gallery */
+    .gallery-title {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      color: #ff85a1;
+      margin: 3rem 0 0.5rem;
+      letter-spacing: 2px;
+    }
+
+    .gallery-sub {
+      color: #8a5070;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      width: 100%;
+      padding: 0 1rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      opacity: 0;
+      animation: photoFadeIn 0.6s ease forwards;
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.03) rotate(-1deg);
+      box-shadow: 0 8px 40px rgba(255, 77, 109, 0.4);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 77, 109, 0.1), transparent);
+      pointer-events: none;
+    }
+
+    @keyframes photoFadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 5, 15, 0.95);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 2rem;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 0 60px rgba(255, 77, 109, 0.3);
+      animation: lightboxIn 0.3s ease;
+    }
+
+    @keyframes lightboxIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 1.5rem;
+      right: 2rem;
+      font-size: 2rem;
+      color: #ff85a1;
+      cursor: pointer;
+      z-index: 1001;
+      transition: transform 0.2s;
+    }
+
+    .lightbox-close:hover {
+      transform: scale(1.2);
+    }
+
+    .lightbox-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2.5rem;
+      color: #ff85a1;
+      cursor: pointer;
+      z-index: 1001;
+      padding: 1rem;
+      transition: transform 0.2s;
+      user-select: none;
+    }
+
+    .lightbox-nav:hover { transform: translateY(-50%) scale(1.2); }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+
     /* Confetti canvas */
     #confetti {
       position: fixed;
@@ -252,6 +377,31 @@
       0%, 100% { transform: rotate(-5deg); }
       50%      { transform: rotate(5deg); }
     }
+
+    /* Scroll hint */
+    .scroll-hint {
+      margin-top: 2rem;
+      color: #8a5070;
+      font-size: 0.9rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .scroll-hint span {
+      display: block;
+      font-size: 1.5rem;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(8px); }
+    }
+
+    @media (max-width: 600px) {
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -265,6 +415,14 @@
 
   <!-- Confetti -->
   <canvas id="confetti"></canvas>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+    <div class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">&#10094;</div>
+    <div class="lightbox-nav lightbox-next" onclick="navLightbox(1)">&#10095;</div>
+    <img id="lightboxImg" src="" alt="">
+  </div>
 
   <!-- Ask screen -->
   <div class="content" id="askScreen">
@@ -293,6 +451,16 @@
     <div class="yes-heart">&#10084;</div>
     <div class="yes-text">Yay!! You made me<br>the happiest person ever!</div>
     <div class="yes-sub">Now we're officially valentines &#x1F49E;</div>
+
+    <div class="scroll-hint">
+      <span>&#x2193;</span>
+      Scroll down to see our memories
+    </div>
+
+    <p class="gallery-title">Our Favorite Moments Together</p>
+    <p class="gallery-sub">every picture tells our story</p>
+
+    <div class="gallery" id="gallery"></div>
   </div>
 
   <script>
@@ -300,6 +468,45 @@
     const noBtn = document.getElementById('noBtn');
     const yesBtn = document.getElementById('yesBtn');
     let noCount = 0;
+    let currentLightboxIndex = 0;
+
+    const photos = [
+      'images/IMG_0669.JPG',
+      'images/IMG_2442.JPG',
+      'images/IMG_2453.jpg',
+      'images/IMG_2460.jpg',
+      'images/IMG_2464.jpg',
+      'images/IMG_2970.jpg',
+      'images/IMG_3044.jpg',
+      'images/IMG_3102.jpg',
+      'images/IMG_3205.jpg',
+      'images/IMG_3515.jpg',
+      'images/IMG_3555.jpg',
+      'images/IMG_4379.jpg',
+      'images/IMG_4867.jpg',
+      'images/IMG_5163.jpg',
+      'images/IMG_5475.jpg',
+      'images/IMG_7189.jpg',
+      'images/IMG_7642.jpg',
+      'images/IMG_7683.jpg',
+      'images/IMG_7698.jpg',
+      'images/IMG_7762.jpg',
+      'images/IMG_7800.jpg',
+      'images/IMG_8149.jpg',
+      'images/IMG_8703.jpg',
+      'images/IMG_8716.jpg',
+      'images/IMG_8866.jpg',
+      'images/IMG_9324.jpg',
+      'images/SAM_1908.JPG',
+      'images/3A97D64F.jpg',
+      'images/RenderedImage.jpg',
+    ];
+
+    // Shuffle photos randomly
+    for (let i = photos.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [photos[i], photos[j]] = [photos[j], photos[i]];
+    }
 
     const noMessages = [
       'No',
@@ -318,28 +525,20 @@
     // The "No" button runs away and shrinks while "Yes" grows
     noBtn.addEventListener('click', () => {
       noCount++;
-
-      // Update no button text
       noBtn.textContent = noMessages[Math.min(noCount, noMessages.length - 1)];
 
-      // Shrink no button
       const noScale = Math.max(0.4, 1 - noCount * 0.08);
       noBtn.style.transform = `scale(${noScale})`;
 
-      // Grow yes button
       const yesScale = 1 + noCount * 0.15;
       yesBtn.style.transform = `scale(${yesScale})`;
       yesBtn.style.fontSize = `${1.3 + noCount * 0.1}rem`;
 
-      // Move no button to a random spot
       const maxX = window.innerWidth - noBtn.offsetWidth - 40;
       const maxY = window.innerHeight - noBtn.offsetHeight - 40;
-      const randX = Math.floor(Math.random() * maxX);
-      const randY = Math.floor(Math.random() * maxY);
-
       noBtn.style.position = 'fixed';
-      noBtn.style.left = randX + 'px';
-      noBtn.style.top = randY + 'px';
+      noBtn.style.left = Math.floor(Math.random() * maxX) + 'px';
+      noBtn.style.top = Math.floor(Math.random() * maxY) + 'px';
       noBtn.style.zIndex = '100';
     });
 
@@ -347,6 +546,7 @@
     function sayYes() {
       document.getElementById('askScreen').style.display = 'none';
       noBtn.style.display = 'none';
+      document.body.style.overflow = 'auto';
       const yesScreen = document.getElementById('yesScreen');
       yesScreen.classList.add('active');
 
@@ -357,7 +557,53 @@
 
       // Confetti!
       launchConfetti();
+
+      // Build gallery
+      buildGallery();
     }
+
+    // Build photo gallery
+    function buildGallery() {
+      const gallery = document.getElementById('gallery');
+      photos.forEach((src, i) => {
+        const item = document.createElement('div');
+        item.classList.add('gallery-item');
+        item.style.animationDelay = `${i * 0.08}s`;
+        item.innerHTML = `<img src="${src}" alt="Our memory" loading="lazy">`;
+        item.addEventListener('click', () => openLightbox(i));
+        gallery.appendChild(item);
+      });
+    }
+
+    // Lightbox
+    function openLightbox(index) {
+      currentLightboxIndex = index;
+      const lb = document.getElementById('lightbox');
+      document.getElementById('lightboxImg').src = photos[index];
+      lb.classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    function navLightbox(dir) {
+      event.stopPropagation();
+      currentLightboxIndex = (currentLightboxIndex + dir + photos.length) % photos.length;
+      document.getElementById('lightboxImg').src = photos[currentLightboxIndex];
+    }
+
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const lb = document.getElementById('lightbox');
+      if (!lb.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navLightbox(-1);
+      if (e.key === 'ArrowRight') navLightbox(1);
+    });
 
     // Floating hearts
     function createHeart() {
@@ -389,35 +635,23 @@
 
       for (let i = 0; i < 200; i++) {
         pieces.push({
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-          vx: (Math.random() - 0.5) * 20,
-          vy: (Math.random() - 0.5) * 20 - 5,
-          w: 6 + Math.random() * 8,
-          h: 4 + Math.random() * 6,
+          x: canvas.width / 2, y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20 - 5,
+          w: 6 + Math.random() * 8, h: 4 + Math.random() * 6,
           color: colors[Math.floor(Math.random() * colors.length)],
-          rot: Math.random() * 360,
-          rotSpeed: (Math.random() - 0.5) * 15,
-          gravity: 0.15 + Math.random() * 0.1,
-          opacity: 1,
+          rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15,
+          gravity: 0.15 + Math.random() * 0.1, opacity: 1,
         });
       }
 
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let alive = false;
-
         for (const p of pieces) {
-          p.vy += p.gravity;
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.rotSpeed;
-          p.vx *= 0.99;
-          p.opacity -= 0.003;
-
+          p.vy += p.gravity; p.x += p.vx; p.y += p.vy;
+          p.rot += p.rotSpeed; p.vx *= 0.99; p.opacity -= 0.003;
           if (p.opacity <= 0) continue;
           alive = true;
-
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate((p.rot * Math.PI) / 180);
@@ -426,27 +660,21 @@
           ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
           ctx.restore();
         }
-
         if (alive) requestAnimationFrame(animate);
       }
-
       animate();
     }
 
     // Click to burst mini hearts
     document.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-yes') || e.target.closest('.btn-no')) return;
+      if (e.target.closest('.btn-yes') || e.target.closest('.btn-no') || e.target.closest('.lightbox') || e.target.closest('.gallery-item')) return;
       for (let i = 0; i < 5; i++) {
         const mini = document.createElement('div');
         mini.textContent = '\u2764\uFE0F';
         mini.style.cssText = `
-          position: fixed;
-          left: ${e.clientX}px;
-          top: ${e.clientY}px;
-          font-size: ${12 + Math.random() * 14}px;
-          pointer-events: none;
-          z-index: 999;
-          opacity: 1;
+          position: fixed; left: ${e.clientX}px; top: ${e.clientY}px;
+          font-size: ${12 + Math.random() * 14}px; pointer-events: none;
+          z-index: 999; opacity: 1;
           transition: all ${0.5 + Math.random() * 0.6}s ease-out;
         `;
         document.body.appendChild(mini);
@@ -458,7 +686,6 @@
       }
     });
 
-    // Resize confetti canvas
     window.addEventListener('resize', () => {
       const canvas = document.getElementById('confetti');
       canvas.width = window.innerWidth;
