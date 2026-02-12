@@ -34,6 +34,9 @@
       bottom: -60px;
       opacity: 0;
       animation: floatUp linear infinite;
+      color: #ff4d6d;
+      text-shadow: 0 0 8px rgba(255, 77, 109, 0.5);
+      font-family: serif;
     }
 
     @keyframes floatUp {
@@ -607,10 +610,9 @@
 
     // Floating hearts
     function createHeart() {
-      const hearts = ['\u2764\uFE0F', '\uD83D\uDC95', '\uD83D\uDC96', '\uD83D\uDC97', '\uD83D\uDC9E', '\uD83E\uDE77', '\uD83D\uDC8C'];
       const heart = document.createElement('div');
       heart.classList.add('floating-heart');
-      heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+      heart.innerHTML = '\u2764';
       heart.style.left = Math.random() * 100 + '%';
       heart.style.fontSize = (18 + Math.random() * 28) + 'px';
       heart.style.animationDuration = (7 + Math.random() * 10) + 's';
@@ -670,7 +672,7 @@
       if (e.target.closest('.btn-yes') || e.target.closest('.btn-no') || e.target.closest('.lightbox') || e.target.closest('.gallery-item')) return;
       for (let i = 0; i < 5; i++) {
         const mini = document.createElement('div');
-        mini.textContent = '\u2764\uFE0F';
+        mini.innerHTML = '\u2764';
         mini.style.cssText = `
           position: fixed; left: ${e.clientX}px; top: ${e.clientY}px;
           font-size: ${12 + Math.random() * 14}px; pointer-events: none;
