@@ -21,7 +21,6 @@
       position: relative;
     }
 
-    /* Sparkle cursor trail */
     .sparkle-trail {
       position: fixed;
       pointer-events: none;
@@ -39,7 +38,6 @@
       100% { transform: scale(0) translateY(-20px); opacity: 0; }
     }
 
-    /* Floating bunnies */
     .floaters-bg {
       position: fixed;
       top: 0; left: 0;
@@ -96,7 +94,6 @@
       100% { transform: translateY(-110vh) rotate(15deg); opacity: 0; }
     }
 
-    /* Soft orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -115,7 +112,6 @@
       to { transform: translate(50px, 30px); }
     }
 
-    /* Content */
     .content {
       position: relative;
       z-index: 1;
@@ -123,7 +119,6 @@
       padding: 2rem;
     }
 
-    /* Keroppi */
     .keroppi {
       position: relative;
       width: 100px;
@@ -208,7 +203,6 @@
       70%      { transform: translateY(-8px); }
     }
 
-    /* Big bunny */
     .bunny {
       position: relative;
       width: 120px;
@@ -358,7 +352,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Buttons */
     .buttons {
       display: flex;
       gap: 1.5rem;
@@ -400,7 +393,6 @@
       transition: all 0.2s ease;
     }
 
-    /* Music toggle */
     .music-toggle {
       position: fixed;
       top: 1.2rem;
@@ -423,7 +415,6 @@
 
     .music-toggle:hover { transform: scale(1.1); background: #fff; }
 
-    /* Yes response */
     .yes-screen {
       display: none;
       text-align: center;
@@ -457,30 +448,34 @@
       margin-top: 0.8rem;
     }
 
-    /* Love notes section */
+    /* Love notes - glassmorphism cards */
     .love-notes {
       margin: 3rem auto 2rem;
-      max-width: 700px;
+      max-width: 800px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.2rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.4rem;
       padding: 0 1rem;
     }
 
     .love-note {
-      background: #fff;
-      border-radius: 16px;
-      padding: 1.5rem 1.2rem;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 182, 193, 0.3);
+      border-radius: 20px;
+      padding: 1.6rem 1.4rem;
       font-family: 'Caveat', cursive;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: #7a4a5a;
-      box-shadow: 0 4px 16px rgba(180, 120, 140, 0.12);
+      box-shadow: 0 8px 32px rgba(180, 120, 140, 0.1);
       transform: rotate(var(--rot, -2deg));
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
       opacity: 0;
       animation: noteIn 0.5s ease forwards;
       position: relative;
-      line-height: 1.4;
+      line-height: 1.5;
+      overflow: hidden;
     }
 
     .love-note::before {
@@ -495,9 +490,31 @@
       border-radius: 2px;
     }
 
+    .love-note::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+      transition: transform 0.6s;
+      transform: translateX(-100%);
+    }
+
+    .love-note:hover::after {
+      transform: translateX(100%);
+    }
+
     .love-note:hover {
-      transform: rotate(0deg) scale(1.05);
-      box-shadow: 0 8px 25px rgba(255, 133, 161, 0.25);
+      transform: rotate(0deg) scale(1.06) translateY(-4px);
+      box-shadow: 0 12px 40px rgba(255, 133, 161, 0.2);
+    }
+
+    .love-note-emoji {
+      display: block;
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
     }
 
     @keyframes noteIn {
@@ -505,40 +522,29 @@
       to { opacity: 1; transform: rotate(var(--rot, -2deg)) translateY(0) scale(1); }
     }
 
-    .love-notes-title {
+    .section-header {
+      margin: 2.5rem 0 0.5rem;
+    }
+
+    .love-notes-title, .gallery-title {
       font-family: 'Caveat', cursive;
       font-size: clamp(1.5rem, 4vw, 2.2rem);
       color: #ff85a1;
-      margin-bottom: 0.3rem;
       letter-spacing: 1px;
     }
 
-    .love-notes-sub {
+    .love-notes-sub, .gallery-sub {
       font-family: 'Caveat', cursive;
       color: #c47a90;
       font-size: 1.1rem;
+      margin-top: 0.2rem;
       margin-bottom: 1rem;
     }
 
-    /* Photo gallery - Polaroid style */
-    .gallery-title {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
-      color: #ff85a1;
-      margin: 2rem 0 0.3rem;
-      letter-spacing: 1px;
-    }
-
-    .gallery-sub {
-      font-family: 'Caveat', cursive;
-      color: #c47a90;
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-    }
-
+    /* Photo gallery - modern polaroid */
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 2rem;
       width: 100%;
       padding: 0 1rem 3rem;
@@ -546,19 +552,20 @@
 
     .polaroid {
       background: #fff;
-      border-radius: 4px;
-      padding: 12px 12px 0 12px;
-      box-shadow: 0 4px 20px rgba(180, 120, 140, 0.15);
+      border-radius: 12px;
+      padding: 10px 10px 0 10px;
+      box-shadow: 0 4px 24px rgba(180, 120, 140, 0.12);
       transform: rotate(var(--rot, 0deg));
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
       cursor: pointer;
       opacity: 0;
       animation: polaroidIn 0.6s ease forwards;
+      overflow: hidden;
     }
 
     .polaroid:hover {
-      transform: rotate(0deg) scale(1.04) translateY(-5px);
-      box-shadow: 0 12px 35px rgba(255, 133, 161, 0.3);
+      transform: rotate(0deg) scale(1.03) translateY(-6px);
+      box-shadow: 0 16px 48px rgba(255, 133, 161, 0.25);
     }
 
     .polaroid img {
@@ -566,14 +573,19 @@
       aspect-ratio: 1;
       object-fit: cover;
       display: block;
-      border-radius: 2px;
+      border-radius: 8px;
+      transition: transform 0.4s ease;
+    }
+
+    .polaroid:hover img {
+      transform: scale(1.02);
     }
 
     .polaroid-caption {
       font-family: 'Caveat', cursive;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       color: #7a4a5a;
-      padding: 10px 4px 14px;
+      padding: 12px 6px 16px;
       text-align: center;
       min-height: 44px;
       line-height: 1.3;
@@ -595,7 +607,7 @@
       justify-content: center;
       cursor: pointer;
       padding: 2rem;
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(8px);
     }
 
     .lightbox.active { display: flex; flex-direction: column; }
@@ -603,7 +615,7 @@
     .lightbox img {
       max-width: 90vw;
       max-height: 75vh;
-      border-radius: 8px;
+      border-radius: 12px;
       box-shadow: 0 0 60px rgba(255, 133, 161, 0.3);
       animation: lightboxIn 0.3s ease;
       border: 6px solid #fff;
@@ -612,7 +624,7 @@
     .lightbox-caption {
       font-family: 'Caveat', cursive;
       color: #ffc2d1;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       margin-top: 1rem;
       text-align: center;
     }
@@ -652,7 +664,6 @@
     .lightbox-prev { left: 1rem; }
     .lightbox-next { right: 1rem; }
 
-    /* Confetti canvas */
     #confetti {
       position: fixed;
       top: 0; left: 0;
@@ -661,7 +672,6 @@
       z-index: 10;
     }
 
-    /* Scroll hint */
     .scroll-hint {
       margin-top: 2rem;
       color: #c47a90;
@@ -677,9 +687,8 @@
       50%      { transform: translateY(8px); }
     }
 
-    /* Divider */
     .cute-divider {
-      margin: 1rem auto;
+      margin: 1.5rem auto;
       font-family: 'Caveat', cursive;
       color: #e8b4c8;
       font-size: 1.5rem;
@@ -696,7 +705,8 @@
       }
       .keroppi { transform: scale(0.8); }
       .bunny { transform: scale(0.85); }
-      .polaroid { padding: 8px 8px 0 8px; }
+      .polaroid { padding: 6px 6px 0 6px; border-radius: 8px; }
+      .polaroid img { border-radius: 6px; }
       .polaroid-caption { font-size: 0.95rem; padding: 8px 2px 10px; }
     }
   </style>
@@ -710,7 +720,6 @@
   <canvas id="confetti"></canvas>
   <button class="music-toggle" id="musicToggle" title="Toggle music">&#9835;</button>
 
-  <!-- Lightbox -->
   <div class="lightbox" id="lightbox">
     <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
     <div class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">&#10094;</div>
@@ -719,7 +728,6 @@
     <div class="lightbox-caption" id="lightboxCaption"></div>
   </div>
 
-  <!-- Ask screen -->
   <div class="content" id="askScreen">
     <div class="keroppi">
       <div class="keroppi-body">
@@ -755,7 +763,6 @@
     </div>
   </div>
 
-  <!-- Yes response -->
   <div class="content yes-screen" id="yesScreen">
     <div class="keroppi" style="margin-bottom:0.5rem">
       <div class="keroppi-body">
@@ -775,17 +782,19 @@
       keep scrolling, it gets cuter
     </div>
 
-    <!-- Love notes -->
     <div class="cute-divider">~ ~ ~</div>
-    <p class="love-notes-title">Things I Love About You</p>
-    <p class="love-notes-sub">a very incomplete list</p>
+    <div class="section-header">
+      <p class="love-notes-title">Our Favorite Memories</p>
+      <p class="love-notes-sub">every moment with you is my favorite</p>
+    </div>
 
     <div class="love-notes" id="loveNotes"></div>
 
-    <!-- Photo gallery -->
     <div class="cute-divider">~ ~ ~</div>
-    <p class="gallery-title">Us Being Cute Together</p>
-    <p class="gallery-sub">every single one is my favorite</p>
+    <div class="section-header">
+      <p class="gallery-title">Us Being Cute Together</p>
+      <p class="gallery-sub">every single one is my favorite</p>
+    </div>
 
     <div class="gallery" id="gallery"></div>
   </div>
@@ -800,68 +809,50 @@
     let audioCtx = null;
 
     const photos = [
-      'images/IMG_0669.JPG', 'images/IMG_2442.JPG', 'images/IMG_2453.jpg',
-      'images/IMG_2460.jpg', 'images/IMG_2464.jpg', 'images/IMG_2970.jpg',
-      'images/IMG_3044.jpg', 'images/IMG_3102.jpg', 'images/IMG_3205.jpg',
-      'images/IMG_3515.jpg', 'images/IMG_3555.jpg', 'images/IMG_4379.jpg',
-      'images/IMG_4867.jpg', 'images/IMG_5163.jpg', 'images/IMG_5475.jpg',
-      'images/IMG_7189.jpg', 'images/IMG_7642.jpg', 'images/IMG_7683.jpg',
-      'images/IMG_7698.jpg', 'images/IMG_7762.jpg', 'images/IMG_7800.jpg',
-      'images/IMG_8149.jpg', 'images/IMG_8703.jpg', 'images/IMG_8716.jpg',
-      'images/IMG_8866.jpg', 'images/IMG_9324.jpg', 'images/SAM_1908.JPG',
-      'images/3A97D64F.jpg', 'images/RenderedImage.jpg',
+      { file: 'images/cookingwithyou.jpg', caption: 'cooking with you is my love language' },
+      { file: 'images/dintaifungyayy.jpg', caption: 'din tai fung dates hit different' },
+      { file: 'images/eatinguniinkanazawa.jpg', caption: 'eating uni in kanazawa together' },
+      { file: 'images/kimonoinkyoto.jpg', caption: 'kimono cuties in kyoto' },
+      { file: 'images/meinkanazawa.JPG', caption: 'me being cute in kanazawa' },
+      { file: 'images/moreswan.jpg', caption: 'more swan content because why not' },
+      { file: 'images/nationalgirlfriendsday.jpg', caption: 'happy national girlfriends day to my #1' },
+      { file: 'images/pokemonbun.jpg', caption: 'found the pokemon bun and lost my mind' },
+      { file: 'images/snowinnagano.jpg', caption: 'snow day in nagano with you' },
+      { file: 'images/swan.jpg', caption: 'the swan that started it all' },
+      { file: 'images/urcousinsbirthday.jpg', caption: 'your cousins birthday, us being us' },
+      { file: 'images/us@source.jpg', caption: 'us at source, looking good as always' },
+      { file: 'images/usatfogodechao.jpg', caption: 'fogo de chao with my favorite person' },
+      { file: 'images/usmakingasteak.jpg', caption: 'us making steak like we\'re on masterchef' },
+      { file: 'images/usonboatatnaplesisland.JPG', caption: 'boat day at naples island with you' },
+      { file: 'images/usoncouch.jpg', caption: 'couch moments are the best moments' },
+      { file: 'images/ussleeping.jpg', caption: 'us sleeping because that\'s an activity too' },
+      { file: 'images/valentineflowers.JPG', caption: 'valentine flowers for my valentine' },
+      { file: 'images/youinjapaninnara.jpg', caption: 'you in nara being the cutest' },
+      { file: 'images/youinkanazawagarden.JPG', caption: 'you in the kanazawa garden, stunning' },
+      { file: 'images/youinobuse.JPG', caption: 'you in obuse, absolutely glowing' },
+      { file: 'images/yourvalentinesgifttome.jpg', caption: 'your valentines gift to me, I love it' },
     ];
 
-    // Cute captions for polaroids
-    const captions = [
-      "you + me = everything",
-      "my favorite hello",
-      "you make me smile like this",
-      "this is my happy place",
-      "us being us",
-      "you're my person",
-      "still can't believe you're mine",
-      "main character energy, both of us",
-      "10/10 would do life with you",
-      "the way you look at me tho",
-      "my heart goes brrr",
-      "certified cuties",
-      "you had me at hello",
-      "together is my favorite place",
-      "falling for you, still",
-      "you're stuck with me now",
-      "the best plot twist in my life",
-      "we're that couple and I love it",
-      "you make boring fun",
-      "my forever plus one",
-      "I like your face a lot",
-      "can we stay like this forever",
-      "you're the reason I smile",
-      "lucky me, lucky us",
-      "my whole heart, right here",
-      "I'd choose you every time",
-      "home is wherever you are",
-      "we just make sense",
-      "the cutest memory",
-    ];
+    // Shuffle photos
+    for (let i = photos.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [photos[i], photos[j]] = [photos[j], photos[i]];
+    }
 
     const loveNoteTexts = [
-      "The way you laugh at my terrible jokes like they're actually funny",
-      "How you always know exactly what I need before I even say it",
-      "Your smile literally makes everything better, it's unfair",
-      "The fact that you put up with my chaos and still choose me every day",
-      "How safe I feel when I'm with you, like nothing else matters",
-      "Your voice when you're sleepy... it does things to my heart",
-      "The way you hold my hand like you never want to let go",
-      "How you make even the most boring days feel like an adventure",
+      { text: 'Cooking together and pretending we\'re on a cooking show', icon: '\u{1F373}' },
+      { text: 'That time we ate uni in Kanazawa and you couldn\'t stop smiling', icon: '\u{1F363}' },
+      { text: 'Wearing kimonos in Kyoto like we belonged there', icon: '\u{1F338}' },
+      { text: 'Snow day in Nagano, your nose was so red and so cute', icon: '\u{2744}\u{FE0F}' },
+      { text: 'Din Tai Fung runs that turn into 2 hour date nights', icon: '\u{1F95F}' },
+      { text: 'Making steak together like we actually know what we\'re doing', icon: '\u{1F525}' },
+      { text: 'Boat days at Naples Island, you + water + sun = perfect', icon: '\u{26F5}' },
+      { text: 'Couch nights where we don\'t need to go anywhere to be happy', icon: '\u{1F6CB}\u{FE0F}' },
+      { text: 'You finding the Pokemon bun and being way too excited about it', icon: '\u{2B50}' },
+      { text: 'Fogo de Chao dates where we both eat way too much', icon: '\u{1F969}' },
+      { text: 'You in the Kanazawa garden looking like a painting', icon: '\u{1F33F}' },
+      { text: 'Every single moment in Japan with you was a movie', icon: '\u{1F5FE}' },
     ];
-
-    // Shuffle photos + captions together
-    const paired = photos.map((p, i) => ({ photo: p, caption: captions[i % captions.length] }));
-    for (let i = paired.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [paired[i], paired[j]] = [paired[j], paired[i]];
-    }
 
     const noMessages = [
       'No',
@@ -877,7 +868,6 @@
       'ok last chance... pls?',
     ];
 
-    // No button
     noBtn.addEventListener('click', () => {
       noCount++;
       noBtn.textContent = noMessages[Math.min(noCount, noMessages.length - 1)];
@@ -903,31 +893,29 @@
       buildGallery();
     }
 
-    // Love notes
     function buildLoveNotes() {
       const container = document.getElementById('loveNotes');
-      loveNoteTexts.forEach((text, i) => {
+      loveNoteTexts.forEach((item, i) => {
         const note = document.createElement('div');
         note.classList.add('love-note');
-        const rot = (Math.random() - 0.5) * 6;
+        const rot = (Math.random() - 0.5) * 5;
         note.style.setProperty('--rot', `${rot}deg`);
-        note.style.animationDelay = `${i * 0.12}s`;
-        note.textContent = text;
+        note.style.animationDelay = `${i * 0.1}s`;
+        note.innerHTML = `<span class="love-note-emoji">${item.icon}</span>${item.text}`;
         container.appendChild(note);
       });
     }
 
-    // Polaroid gallery
     function buildGallery() {
       const gallery = document.getElementById('gallery');
-      paired.forEach(({ photo, caption }, i) => {
+      photos.forEach(({ file, caption }, i) => {
         const pol = document.createElement('div');
         pol.classList.add('polaroid');
-        const rot = (Math.random() - 0.5) * 5;
+        const rot = (Math.random() - 0.5) * 4;
         pol.style.setProperty('--rot', `${rot}deg`);
-        pol.style.animationDelay = `${i * 0.08}s`;
+        pol.style.animationDelay = `${i * 0.07}s`;
         pol.innerHTML = `
-          <img src="${photo}" alt="Our memory" loading="lazy">
+          <img src="${file}" alt="${caption}" loading="lazy">
           <div class="polaroid-caption">${caption}</div>
         `;
         pol.addEventListener('click', () => openLightbox(i));
@@ -935,11 +923,10 @@
       });
     }
 
-    // Lightbox
     function openLightbox(index) {
       currentLightboxIndex = index;
-      document.getElementById('lightboxImg').src = paired[index].photo;
-      document.getElementById('lightboxCaption').textContent = paired[index].caption;
+      document.getElementById('lightboxImg').src = photos[index].file;
+      document.getElementById('lightboxCaption').textContent = photos[index].caption;
       document.getElementById('lightbox').classList.add('active');
     }
 
@@ -949,9 +936,9 @@
 
     function navLightbox(dir) {
       event.stopPropagation();
-      currentLightboxIndex = (currentLightboxIndex + dir + paired.length) % paired.length;
-      document.getElementById('lightboxImg').src = paired[currentLightboxIndex].photo;
-      document.getElementById('lightboxCaption').textContent = paired[currentLightboxIndex].caption;
+      currentLightboxIndex = (currentLightboxIndex + dir + photos.length) % photos.length;
+      document.getElementById('lightboxImg').src = photos[currentLightboxIndex].file;
+      document.getElementById('lightboxCaption').textContent = photos[currentLightboxIndex].caption;
     }
 
     document.getElementById('lightbox').addEventListener('click', (e) => {
@@ -965,7 +952,6 @@
       if (e.key === 'ArrowRight') navLightbox(1);
     });
 
-    // Floating bunnies
     function createFloater() {
       const wrapper = document.createElement('div');
       wrapper.classList.add('floating-bunny');
@@ -981,7 +967,6 @@
     for (let i = 0; i < 6; i++) setTimeout(() => createFloater(), i * 700);
     setInterval(createFloater, 2500);
 
-    // Sparkle cursor trail
     let lastSparkle = 0;
     document.addEventListener('mousemove', (e) => {
       const now = Date.now();
@@ -998,7 +983,6 @@
       setTimeout(() => sparkle.remove(), 600);
     });
 
-    // Confetti
     function launchConfetti() {
       const canvas = document.getElementById('confetti');
       const ctx = canvas.getContext('2d');
@@ -1043,7 +1027,6 @@
       c.height = window.innerHeight;
     });
 
-    // Music Box
     let musicInterval = null;
     let gainNode = null;
 
