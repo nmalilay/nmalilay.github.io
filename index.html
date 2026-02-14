@@ -879,6 +879,7 @@
 
     function buildLoveNotes() {
       const container = document.getElementById('loveNotes');
+      if (!container) return;
       loveNoteTexts.forEach((item, i) => {
         const note = document.createElement('div');
         note.classList.add('love-note');
