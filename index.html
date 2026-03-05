@@ -13,10 +13,6 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   />
-  <link
-    rel="stylesheet"
-    href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css"
-  />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -110,54 +106,26 @@
     }
 
     .timeline-shell {
-      height: 680px;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       overflow: hidden;
       background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%);
     }
 
-    .tl-timeline {
-      font-family: "Manrope", system-ui, sans-serif !important;
-    }
-
-    .tl-timeline .tl-headline,
-    .tl-timeline .tl-headline-date,
-    .tl-timeline .tl-text-content p,
-    .tl-timeline .tl-text-content li {
-      font-family: "Manrope", system-ui, sans-serif !important;
-      color: #1f2937 !important;
-    }
-
-    .tl-timeline .tl-headline,
-    .tl-timeline .tl-slide .tl-slide-content .tl-headline {
-      font-family: "Sora", system-ui, sans-serif !important;
-    }
-
-    .tl-timeline .tl-slidenav-next,
-    .tl-timeline .tl-slidenav-previous {
-      color: #0f172a !important;
-      text-shadow: none !important;
-    }
-
-    .tl-timeline .tl-menubar,
-    .tl-timeline .tl-timeaxis-background,
-    .tl-timeline .tl-attribution {
-      background: #fffaf5 !important;
-    }
-
-    .tl-timeline .tl-slide-content-container {
-      box-shadow: none !important;
-      background: transparent !important;
-    }
-
-    .tl-timeline .tl-text a {
-      color: #ea580c !important;
+    .timeline-frame {
+      width: 100%;
+      height: 650px;
+      border: 0;
+      display: block;
     }
 
     @media (max-width: 768px) {
       .timeline-shell {
-        height: 600px;
+        border-radius: 6px;
+      }
+
+      .timeline-frame {
+        height: 560px;
       }
     }
   </style>
@@ -170,7 +138,6 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -266,7 +233,7 @@
       },
       {
         name: "TimelineJS",
-        reason: "Historical narrative with media, eras, and source-linked event slides.",
+        reason: "Embedded historical narrative using Knight Lab's hosted timeline component.",
         color: "border-rose-200 bg-rose-50",
       },
     ];
@@ -417,21 +384,6 @@
         return () => {
           map.remove();
         };
-      }, []);
-
-      useEffect(() => {
-        const timelineEl = document.getElementById("timeline-embed");
-        if (!timelineEl || timelineEl.dataset.ready === "true" || typeof TL === "undefined") return;
-
-        timelineEl.dataset.ready = "true";
-        new TL.Timeline("timeline-embed", "data/la_walkability_timeline.json", {
-          font: null,
-          language: "en",
-          hash_bookmark: false,
-          start_at_end: false,
-          scale_factor: 1,
-          timenav_height_percentage: 28,
-        });
       }, []);
 
       return (
@@ -639,23 +591,26 @@
                 <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Planning history to measurement</div>
               </div>
               <p className="mt-3 text-slate-600 max-w-3xl">
-                This TimelineJS section links early zoning and freeway development to later research on school travel,
+                This embedded timeline links early zoning and freeway development to later research on school travel,
                 park access, heat, asthma, and new walkability measurement methods.
               </p>
               <div className="mt-6 bg-white border border-slate-200 rounded p-4 shadow-soft">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Interactive historical narrative</div>
-                    <div className="font-display text-lg mt-1">Why LA County walkability looks the way it does</div>
-                  </div>
-                  <a
-                    href="data/Final Project Timeline.xlsx"
-                    className="px-3 py-2 rounded border border-slate-300 text-sm text-slate-700 font-semibold"
-                  >
-                    Timeline workbook
-                  </a>
+                <div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Interactive historical narrative</div>
+                  <div className="font-display text-lg mt-1">Why LA County walkability looks the way it does</div>
                 </div>
-                <div className="mt-4 timeline-shell" id="timeline-embed"></div>
+                <div className="mt-4 timeline-shell">
+                  <iframe
+                    src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vSs2C1VY9BmUZ_Pd0ih4RoHZMMDIMoaIrfOvkmpza6rUaxxzW6EcTKp6z0PwyFcc3tCzKRsSF7vvGb3&font=Default&lang=en&initial_zoom=2&width=100%25&height=650"
+                    title="Walkability timeline"
+                    className="timeline-frame"
+                    webkitallowfullscreen="true"
+                    mozallowfullscreen="true"
+                    allowFullScreen
+                    frameBorder="0"
+                    loading="lazy"
+                  ></iframe>
+                </div>
               </div>
             </section>
 
