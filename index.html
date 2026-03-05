@@ -3,31 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Walkability in Los Angeles</title>
+  <title>Walkability in LA County</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            ink: "#0b1220",
-            asphalt: "#111827",
-            cement: "#f1f5f9",
-            crosswalk: "#f8fafc",
-            park: "#22c55e",
-            transit: "#38bdf8",
-            signal: "#facc15",
-            brick: "#ef4444",
+            ink: "#1f2937",
+            asphalt: "#0f172a",
+            sand: "#fff7ef",
+            haze: "#f8fafc",
+            sunset: "#f97316",
+            ocean: "#0ea5e9",
+            palm: "#16a34a",
+            coral: "#fb7185",
           },
           fontFamily: {
-            display: ["Space Grotesk", "system-ui", "sans-serif"],
-            body: ["Work Sans", "system-ui", "sans-serif"],
+            display: ["Sora", "system-ui", "sans-serif"],
+            body: ["Manrope", "system-ui", "sans-serif"],
           },
           boxShadow: {
-            soft: "0 18px 40px rgba(2, 6, 23, 0.12)",
+            soft: "0 12px 28px rgba(15, 23, 42, 0.12)",
           },
         },
       },
@@ -39,31 +45,24 @@
     }
 
     body {
-      font-family: "Work Sans", system-ui, sans-serif;
+      font-family: "Manrope", system-ui, sans-serif;
       background:
-        radial-gradient(1200px 700px at 10% -10%, rgba(34, 197, 94, 0.18), transparent 60%),
-        radial-gradient(900px 600px at 110% 20%, rgba(56, 189, 248, 0.18), transparent 55%),
-        linear-gradient(180deg, #f8fafc 0%, #f1f5f9 60%, #f8fafc 100%);
-      color: #0b1220;
-    }
-
-    .map-grid {
-      background-image:
-        linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px),
-        linear-gradient(0deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
-      background-size: 80px 80px;
-    }
-
-    .crosswalk-bar {
-      background: repeating-linear-gradient(90deg, #f8fafc 0 18px, #111827 18px 34px);
+        radial-gradient(900px 520px at 85% -10%, rgba(249, 115, 22, 0.18), transparent 55%),
+        radial-gradient(760px 520px at 0% 0%, rgba(14, 165, 233, 0.16), transparent 60%),
+        linear-gradient(180deg, #fff7ef 0%, #ffffff 48%, #f8fafc 100%);
+      color: #1f2937;
     }
 
     .route-dash {
-      background: repeating-linear-gradient(90deg, #facc15 0 16px, transparent 16px 28px);
+      background: repeating-linear-gradient(90deg, rgba(249, 115, 22, 0.9) 0 16px, transparent 16px 28px);
     }
 
     .glow-node {
-      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.12), 0 0 22px rgba(34, 197, 94, 0.35);
+      box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.12), 0 0 20px rgba(249, 115, 22, 0.3);
+    }
+
+    .divider-line {
+      background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), rgba(249, 115, 22, 0.35), rgba(14, 165, 233, 0.15));
     }
 
     .float-card {
@@ -78,11 +77,43 @@
     @media (prefers-reduced-motion: reduce) {
       .float-card { animation: none; }
     }
+
+    .map-shell {
+      height: 520px;
+    }
+
+    @media (max-width: 768px) {
+      .map-shell {
+        height: 420px;
+      }
+    }
+
+    .leaflet-container {
+      font-family: "Manrope", system-ui, sans-serif;
+    }
+
+    .leaflet-tooltip {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #1f2937;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+      border-radius: 6px;
+      padding: 6px 10px;
+    }
+
+    .leaflet-tooltip:before {
+      border-top-color: #ffffff;
+    }
   </style>
 </head>
 <body class="min-h-screen">
   <div id="root"></div>
 
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -94,6 +125,7 @@
       { id: "home", label: "Home" },
       { id: "data", label: "Data" },
       { id: "narrative", label: "Narrative" },
+      { id: "map", label: "Map" },
       { id: "case-study", label: "Case Study" },
       { id: "methods", label: "Methods" },
       { id: "team", label: "Team" },
@@ -105,10 +137,10 @@
         id: "q1",
         title: "Question 1: Where are the highest and lowest walkability scores?",
         body:
-          "We map NatWalkInd across the LA region to see how walkability clusters across block groups.",
+          "We map NatWalkInd across LA County to see how walkability clusters across block groups.",
         image: "images/walkability_map.png",
-        alt: "Walkability index map for the LA region",
-        caption: "Figure 1: National Walkability Index map (LA metro block groups)",
+        alt: "Walkability index map for LA County",
+        caption: "Figure 1: National Walkability Index map (LA County block groups)",
       },
       {
         id: "q2",
@@ -140,6 +172,10 @@
         detail: "Population, income, and household context joined to SLD geographies.",
       },
       {
+        name: "TIGER/Line block group boundaries",
+        detail: "Geometries used to render the LA County interactive map.",
+      },
+      {
         name: "Transit access (GTFS)",
         detail: "Transit stop proximity and service access inputs inside SLD.",
       },
@@ -164,6 +200,11 @@
         name: "ArcGIS",
         reason: "Geographic mapping and boundary work.",
         color: "border-amber-200 bg-amber-50",
+      },
+      {
+        name: "Leaflet",
+        reason: "Interactive map rendering with hover tooltips.",
+        color: "border-orange-200 bg-orange-50",
       },
     ];
 
@@ -208,22 +249,128 @@
       const sectionIds = useMemo(() => navItems.map((item) => item.id), []);
       const progress = useScrollProgress();
       const active = useActiveSection(sectionIds);
+      const [hoverInfo, setHoverInfo] = useState(null);
+
+      const formatNumber = (value, digits = 0) => {
+        if (value === null || value === undefined || Number.isNaN(value)) return "-";
+        return Number(value).toLocaleString(undefined, {
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits,
+        });
+      };
+
+      const formatPct = (value) => {
+        if (value === null || value === undefined || Number.isNaN(value)) return "-";
+        return `${(Number(value) * 100).toFixed(1)}%`;
+      };
+
+      const infoRows = [
+        { key: "walk", label: "Walkability", format: (v) => formatNumber(v, 1) },
+        { key: "transit", label: "Transit access (D4A)", format: (v) => formatNumber(v, 0) },
+        { key: "carfree", label: "Car-free households", format: formatPct },
+        { key: "lowwage", label: "Low-wage share", format: formatPct },
+        {
+          key: "income",
+          label: "Median HH income",
+          format: (v) => (v === null || v === undefined ? "-" : `$${Math.round(v).toLocaleString()}`),
+        },
+        { key: "pop", label: "Population", format: (v) => formatNumber(v, 0) },
+        { key: "hisp", label: "Hispanic", format: formatPct },
+        { key: "white", label: "White (NH)", format: formatPct },
+        { key: "black", label: "Black (NH)", format: formatPct },
+        { key: "asian", label: "Asian (NH)", format: formatPct },
+        { key: "bach", label: "Bachelor's+", format: formatPct },
+        { key: "rent35", label: "Rent burden 35%+", format: formatPct },
+        { key: "u18", label: "Under 18", format: formatPct },
+        { key: "age65", label: "65+", format: formatPct },
+        {
+          key: "no_transit",
+          label: "Transit service",
+          format: (v) => (v === null || v === undefined ? "-" : v === 1 ? "No service" : "Service"),
+        },
+      ];
+
+      useEffect(() => {
+        const mapEl = document.getElementById("la-map");
+        if (!mapEl || mapEl._leaflet_id) return;
+        const map = L.map(mapEl, {
+          scrollWheelZoom: false,
+          preferCanvas: true,
+        }).setView([34.05, -118.25], 9);
+
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+          attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+        }).addTo(map);
+
+        const getColor = (value) => {
+          if (value >= 18) return "#ea580c";
+          if (value >= 16) return "#f97316";
+          if (value >= 14) return "#fb923c";
+          if (value >= 12) return "#fdba74";
+          if (value >= 10) return "#fed7aa";
+          return "#ffedd5";
+        };
+
+        const style = (feature) => ({
+          color: "#ffffff",
+          weight: 0.3,
+          fillColor: getColor(feature.properties.walk),
+          fillOpacity: 0.85,
+        });
+
+        let geoLayer = null;
+
+        fetch("data/la_walkability.geojson")
+          .then((res) => res.json())
+          .then((data) => {
+            geoLayer = L.geoJSON(data, {
+              style,
+              renderer: L.canvas({ padding: 0.5 }),
+              onEachFeature: (feature, layer) => {
+                layer.on({
+                  mouseover: (event) => {
+                    const target = event.target;
+                    target.setStyle({ weight: 1.1, color: "#0f172a", fillOpacity: 0.95 });
+                    target.bringToFront();
+                    setHoverInfo(feature.properties);
+                  },
+                  mouseout: (event) => {
+                    geoLayer.resetStyle(event.target);
+                  },
+                  click: (event) => {
+                    map.fitBounds(event.target.getBounds(), { padding: [12, 12] });
+                  },
+                });
+                const value = feature.properties.walk;
+                layer.bindTooltip(
+                  `Walkability: ${value === null || value === undefined ? "-" : value.toFixed(1)}`,
+                  { sticky: true, direction: "top" }
+                );
+              },
+            }).addTo(map);
+            map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
+          });
+
+        return () => {
+          map.remove();
+        };
+      }, []);
 
       return (
-        <div className="map-grid">
+        <div className="min-h-screen">
           <div
-            className="fixed top-0 left-0 h-1 bg-park z-50"
+            className="fixed top-0 left-0 h-1 bg-sunset z-50"
             style={{ width: `${progress}%` }}
           />
 
           <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
             <div className="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center gap-4 justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-md bg-asphalt text-crosswalk flex items-center justify-center font-display text-lg">
+                <div className="w-10 h-10 rounded-md bg-asphalt text-white flex items-center justify-center font-display text-lg">
                   LA
                 </div>
                 <div>
-                  <div className="font-display text-lg">Walkability in Los Angeles</div>
+                  <div className="font-display text-lg">Walkability in LA County</div>
                   <div className="text-xs text-slate-500">Built environment, equity, and access</div>
                 </div>
               </div>
@@ -234,7 +381,7 @@
                     href={`#${item.id}`}
                     className={`px-2.5 py-1.5 rounded-md border transition ${
                       active === item.id
-                        ? "bg-asphalt text-crosswalk border-asphalt"
+                        ? "bg-asphalt text-white border-asphalt"
                         : "bg-white text-slate-600 border-slate-200 hover:border-asphalt"
                     }`}
                   >
@@ -257,13 +404,13 @@
                     Walkability is not evenly distributed. This project maps who benefits, and why.
                   </h1>
                   <p className="text-slate-600 text-lg">
-                    We analyze the EPA Smart Location Database with Greater Los Angeles regional context to
-                    understand how infrastructure, history, and policy shape access to safe, walkable streets.
+                    We analyze the EPA Smart Location Database with LA County context to understand how
+                    infrastructure, history, and policy shape access to safe, walkable streets.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <a
                       href="#narrative"
-                      className="px-4 py-2.5 rounded-md bg-asphalt text-crosswalk font-semibold shadow-soft"
+                      className="px-4 py-2.5 rounded-md bg-asphalt text-white font-semibold shadow-soft"
                     >
                       Read the narrative
                     </a>
@@ -275,26 +422,26 @@
                     </a>
                   </div>
                   <div className="flex flex-wrap gap-3 text-sm text-slate-600">
-                    <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">LA metro focus</span>
+                    <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">LA County focus</span>
                     <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">Census block groups</span>
                     <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">Equity lens</span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                     <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
                       <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Block groups</div>
-                      <div className="font-display text-lg">10,800</div>
+                      <div className="font-display text-lg">6,425</div>
                     </div>
                     <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
                       <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Mean walkability</div>
-                      <div className="font-display text-lg">12.9</div>
+                      <div className="font-display text-lg">13.6</div>
                     </div>
                     <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
                       <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Car-free share</div>
-                      <div className="font-display text-lg">6.8%</div>
+                      <div className="font-display text-lg">8.4%</div>
                     </div>
                     <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
                       <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Transit access</div>
-                      <div className="font-display text-lg">373.9</div>
+                      <div className="font-display text-lg">348.6</div>
                     </div>
                   </div>
                 </div>
@@ -304,7 +451,7 @@
                       <h2 className="font-display text-xl">Walkability Index Legend</h2>
                       <span className="text-xs uppercase tracking-[0.2em] text-slate-400">1 to 20</span>
                     </div>
-                    <div className="h-3 rounded-md bg-gradient-to-r from-slate-200 via-emerald-200 to-emerald-600"></div>
+                    <div className="h-3 rounded-md bg-gradient-to-r from-orange-100 via-orange-300 to-orange-600"></div>
                     <div className="flex justify-between text-xs text-slate-500">
                       <span>Lower walkability</span>
                       <span>Higher walkability</span>
@@ -320,7 +467,7 @@
                   </div>
                 </div>
               </div>
-              <div className="mt-8 h-2 rounded-md crosswalk-bar"></div>
+              <div className="mt-8 h-1 rounded-md divider-line"></div>
             </section>
 
             <section id="data" className="py-8">
@@ -330,14 +477,14 @@
               </div>
               <p className="mt-3 text-slate-600 max-w-3xl">
                 We prioritized datasets that capture walkability, transit access, and neighborhood context
-                at fine geographic scales. These sources allow consistent joins to Census geographies and
-                support equity-focused analysis.
+                at fine geographic scales for LA County. These sources allow consistent joins to Census
+                geographies and support equity-focused analysis.
               </p>
               <div className="mt-6 grid md:grid-cols-2 gap-4">
                 {dataSources.map((source) => (
                   <div key={source.name} className="bg-white border border-slate-200 rounded p-5 shadow-soft">
                     <div className="flex items-start gap-3">
-                      <div className="w-3 h-3 rounded-md bg-park mt-2 glow-node"></div>
+                      <div className="w-3 h-3 rounded-md bg-sunset mt-2 glow-node"></div>
                       <div>
                         <div className="font-display text-lg">{source.name}</div>
                         <div className="text-sm text-slate-600 mt-1">{source.detail}</div>
@@ -357,15 +504,15 @@
                 </div>
                 <div className="h-44 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
                   <img
-                    src="images/walkability_by_cbsa_boxplot.svg"
-                    alt="Walkability by CBSA boxplot"
+                    src="images/walkability_by_income_quartile.svg"
+                    alt="Walkability by income quartile boxplot"
                     className="w-full h-full object-contain"
                     loading="lazy"
                   />
                 </div>
               </div>
               <div className="mt-2 text-xs text-slate-500">
-                Figure A: Distribution of National Walkability Index. Figure B: Walkability by CBSA (boxplot).
+                Figure A: Distribution of National Walkability Index. Figure B: Walkability by income quartile (boxplot).
               </div>
             </section>
 
@@ -384,7 +531,7 @@
                     <ol className="mt-4 space-y-4 text-sm text-slate-600">
                       {storySteps.map((step, index) => (
                         <li key={step.id} className="flex gap-3">
-                          <span className="w-7 h-7 rounded-md bg-asphalt text-crosswalk flex items-center justify-center text-xs font-semibold">
+                          <span className="w-7 h-7 rounded-md bg-asphalt text-white flex items-center justify-center text-xs font-semibold">
                             {index + 1}
                           </span>
                           <span>{step.title}</span>
@@ -408,6 +555,53 @@
               </div>
             </section>
 
+            <section id="map" className="py-8">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-2xl">Interactive Map</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">LA County</div>
+              </div>
+              <p className="mt-3 text-slate-600 max-w-3xl">
+                Hover any block group to see walkability, transit access, and neighborhood context. Click a block group
+                to zoom and explore local patterns.
+              </p>
+              <div className="mt-6 grid lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-white border border-slate-200 rounded p-4 shadow-soft">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="uppercase tracking-[0.2em]">NatWalkInd</span>
+                    <span>Low &rarr; High</span>
+                  </div>
+                  <div className="mt-2 h-2 rounded-md bg-gradient-to-r from-orange-100 via-orange-300 to-orange-600"></div>
+                  <div className="mt-4 map-shell rounded-md overflow-hidden border border-slate-200" id="la-map"></div>
+                  <div className="mt-3 text-xs text-slate-500">
+                    Data source: EPA Smart Location Database (2019), LA County block groups.
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded p-5 shadow-soft">
+                  <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Hover Details</div>
+                  {hoverInfo ? (
+                    <div>
+                      <div className="mt-2 text-sm text-slate-600">Block group GEOID</div>
+                      <div className="font-display text-lg">{hoverInfo.geoid}</div>
+                      <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        {infoRows.map((row) => (
+                          <div key={row.key} className="border border-slate-200 rounded p-2 bg-slate-50">
+                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{row.label}</div>
+                            <div className="font-display text-base text-ink">
+                              {row.format(hoverInfo[row.key])}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-sm text-slate-600">
+                      Hover over a block group to see the full profile.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </section>
+
             <section id="case-study" className="py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <h2 className="font-display text-2xl">Case Study</h2>
@@ -417,15 +611,15 @@
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
                   <h3 className="font-display text-xl">High Walkability (Top 10%)</h3>
                   <p className="mt-3 text-slate-600">
-                    1,157 block groups average a walkability score of 17.8 with a 10.7% car-free household share.
-                    Transit access (D4A) averages 269, while median household income averages about $68.9k.
+                    697 block groups average a walkability score of 18.0 with a 12.5% car-free household share.
+                    Transit access (D4A) averages 233.7, while median household income averages about $68.6k.
                   </p>
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
                   <h3 className="font-display text-xl">Low Walkability (Bottom 10%)</h3>
                   <p className="mt-3 text-slate-600">
-                    1,139 block groups average a walkability score of 5.9 with a 3.1% car-free household share.
-                    Transit access (D4A) averages 4.7, and median household income averages about $97.5k.
+                    667 block groups average a walkability score of 6.9 with a 4.0% car-free household share.
+                    Transit access (D4A) averages 36.1, and median household income averages about $99.1k.
                   </p>
                 </div>
               </div>
@@ -474,12 +668,11 @@
               </div>
               <div className="mt-6 bg-white border border-slate-200 rounded p-6 shadow-soft">
                 <h3 className="font-display text-xl">Processing Our Data</h3>
-                <p className="mt-3 text-slate-600">We cleaned, filtered, and aligned multiple sources to focus on LA metro block groups.</p>
+                <p className="mt-3 text-slate-600">We cleaned, filtered, and aligned multiple sources to focus on LA County block groups.</p>
                 <p className="mt-4 text-sm text-slate-600">
                   We used Python (pandas, geopandas) to load the cleaned CSV, exclude rows missing key fields per chart,
-                  compute deciles and correlations, and join block-group geometries for mapping. The provided dataset already
-                  targets the Los Angeles metro counties (Los Angeles, Orange, Riverside, San Bernardino, Ventura), so we
-                  kept that footprint for all summaries and visualizations.
+                  compute deciles and correlations, and join block-group geometries for mapping. We filtered to COUNTYFP 037
+                  to keep only LA County for summaries and the interactive map.
                 </p>
               </div>
               <p className="mt-5 text-sm text-slate-600">
@@ -586,8 +779,8 @@
 
           <footer className="border-t border-slate-200 bg-white/80 backdrop-blur">
             <div className="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
-              <span>Walkability in Los Angeles - Project site</span>
-              <span>Built with React and Tailwind CSS</span>
+              <span>Walkability in LA County - Project site</span>
+              <span>Built with React, Tailwind CSS, and Leaflet</span>
             </div>
           </footer>
         </div>

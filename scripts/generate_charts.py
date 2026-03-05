@@ -10,9 +10,12 @@ from matplotlib.colors import LinearSegmentedColormap
 
 DATA_CSV = Path("/Users/nick/Downloads/dgt hum 101/Data/LA_SLD_ACS_Cleaned.csv")
 SHAPEFILE = Path("/Users/nick/Downloads/dgt hum 101/Data/tiger_line_2019_SLD_joined/tiger_line_2019_SLD_joined.shp")
-OUT_DIR = Path("/Users/nick/Documents/GitHub/nmalilay.github.io/images")
+SITE_DIR = Path("/Users/nick/Documents/GitHub/nmalilay.github.io")
+OUT_DIR = SITE_DIR / "images"
+DATA_DIR = SITE_DIR / "data"
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 PALETTE = {
     "asphalt": "#111827",
@@ -42,7 +45,12 @@ plt.rcParams.update(
 
 def load_data() -> pd.DataFrame:
     df = pd.read_csv(DATA_CSV)
+    df["COUNTYFP"] = df["COUNTYFP"].astype(str).str.zfill(3)
     return df
+
+
+def filter_la_county(df: pd.DataFrame) -> pd.DataFrame:
+    return df[df["COUNTYFP"] == "037"].copy()
 
 
 def save_histogram(df: pd.DataFrame) -> None:
@@ -57,20 +65,24 @@ def save_histogram(df: pd.DataFrame) -> None:
     plt.close(fig)
 
 
-def save_boxplot(df: pd.DataFrame) -> None:
+def save_income_quartile_boxplot(df: pd.DataFrame) -> None:
     fig, ax = plt.subplots(figsize=(6.2, 3.2))
-    grouped = [g["NatWalkInd"].dropna().values for _, g in df.groupby("CBSA_Name")]
-    labels = [name.replace(", CA", "") for name, _ in df.groupby("CBSA_Name")]
-    bp = ax.boxplot(grouped, tick_labels=labels, patch_artist=True, widths=0.5)
+    df = df.copy()
+    df["income_quartile"] = pd.qcut(
+        df["median_household_income"], 4, labels=["Q1 (Lowest)", "Q2", "Q3", "Q4 (Highest)"]
+    )
+    grouped = [g["NatWalkInd"].dropna().values for _, g in df.groupby("income_quartile", observed=True)]
+    labels = [label for label, _ in df.groupby("income_quartile", observed=True)]
+    bp = ax.boxplot(grouped, tick_labels=labels, patch_artist=True, widths=0.55)
     for box in bp["boxes"]:
         box.set(facecolor=PALETTE["transit"], alpha=0.6, edgecolor=PALETTE["asphalt"])
     for median in bp["medians"]:
         median.set(color=PALETTE["asphalt"], linewidth=1.5)
-    ax.set_title("Walkability by CBSA")
+    ax.set_title("Walkability by Income Quartile")
     ax.set_ylabel("NatWalkInd")
     ax.grid(axis="y", alpha=0.7)
     fig.tight_layout()
-    fig.savefig(OUT_DIR / "walkability_by_cbsa_boxplot.svg")
+    fig.savefig(OUT_DIR / "walkability_by_income_quartile.svg")
     plt.close(fig)
 
 
@@ -149,13 +161,35 @@ def save_case_study(df: pd.DataFrame) -> None:
     plt.close(fig)
 
 
-def save_map() -> None:
+def save_map(df: pd.DataFrame) -> None:
     gdf = gpd.read_file(SHAPEFILE)
-    if "NatWalkInd" not in gdf.columns:
-        df = load_data()
-        gdf = gdf.merge(df[["GEOID20", "NatWalkInd"]], left_on="GEOID20", right_on="GEOID20", how="left")
-
+    gdf["COUNTYFP"] = gdf["COUNTYFP"].astype(str).str.zfill(3)
+    gdf = gdf[gdf["COUNTYFP"] == "037"].copy()
+    join_cols = [
+        "GEOID20",
+        "NatWalkInd",
+        "Pct_AO0",
+        "D4A",
+        "R_PCTLOWWAGE",
+        "median_household_income",
+        "TotPop",
+        "pct_hispanic",
+        "pct_white_nh",
+        "pct_black_nh",
+        "pct_asian_nh",
+        "pct_under18",
+        "pct_65plus",
+        "pct_bachelors_or_higher",
+        "pct_rent_burden_35plus",
+        "no_transit_service",
+    ]
+    drop_cols = [col for col in join_cols if col in gdf.columns and col != "GEOID20"]
+    if drop_cols:
+        gdf = gdf.drop(columns=drop_cols)
+    gdf = gdf.merge(df[join_cols], on="GEOID20", how="left")
     gdf = gdf.dropna(subset=["NatWalkInd"]).copy()
+    gdf = gdf.to_crs(epsg=4326)
+    gdf["geometry"] = gdf.geometry.simplify(0.0006, preserve_topology=True)
 
     fig, ax = plt.subplots(figsize=(6.2, 7.4))
     gdf.plot(
@@ -166,19 +200,43 @@ def save_map() -> None:
         antialiased=False,
     )
     ax.set_axis_off()
-    sm = plt.cm.ScalarMappable(cmap="YlGn", norm=plt.Normalize(vmin=gdf["NatWalkInd"].min(), vmax=gdf["NatWalkInd"].max()))
+    sm = plt.cm.ScalarMappable(
+        cmap="YlGn", norm=plt.Normalize(vmin=gdf["NatWalkInd"].min(), vmax=gdf["NatWalkInd"].max())
+    )
     sm._A = []
     cbar = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.01)
     cbar.set_label("NatWalkInd")
     fig.tight_layout()
-    fig.savefig(OUT_DIR / "walkability_map.png", dpi=200)
+    fig.savefig(OUT_DIR / "walkability_map.png", dpi=220)
     plt.close(fig)
+
+    prop_map = {
+        "GEOID20": "geoid",
+        "NatWalkInd": "walk",
+        "Pct_AO0": "carfree",
+        "D4A": "transit",
+        "R_PCTLOWWAGE": "lowwage",
+        "median_household_income": "income",
+        "TotPop": "pop",
+        "pct_hispanic": "hisp",
+        "pct_white_nh": "white",
+        "pct_black_nh": "black",
+        "pct_asian_nh": "asian",
+        "pct_under18": "u18",
+        "pct_65plus": "age65",
+        "pct_bachelors_or_higher": "bach",
+        "pct_rent_burden_35plus": "rent35",
+        "no_transit_service": "no_transit",
+    }
+    keep_cols = ["geometry"] + list(prop_map.keys())
+    out = gdf[keep_cols].rename(columns=prop_map)
+    out.to_file(DATA_DIR / "la_walkability.geojson", driver="GeoJSON")
 
 
 def main() -> None:
-    df = load_data()
+    df = filter_la_county(load_data())
     save_histogram(df)
-    save_boxplot(df)
+    save_income_quartile_boxplot(df)
     scatter_with_trend(
         df["Pct_AO0"].to_numpy(),
         df["D4A"].to_numpy(),
@@ -199,7 +257,7 @@ def main() -> None:
     )
     save_heatmap(df)
     save_case_study(df)
-    save_map()
+    save_map(df)
 
 
 if __name__ == "__main__":
