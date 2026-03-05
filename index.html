@@ -1,1107 +1,521 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Will You Be My Valentine Bunabella?</title>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Walkability in Los Angeles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#0b1220",
+            asphalt: "#111827",
+            cement: "#f1f5f9",
+            crosswalk: "#f8fafc",
+            park: "#22c55e",
+            transit: "#38bdf8",
+            signal: "#facc15",
+            brick: "#ef4444",
+          },
+          fontFamily: {
+            display: ["Space Grotesk", "system-ui", "sans-serif"],
+            body: ["Work Sans", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            soft: "0 18px 40px rgba(2, 6, 23, 0.12)",
+          },
+        },
+      },
+    };
+  </script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(160deg, #fff5f7 0%, #ffe8ef 30%, #ffd6e0 60%, #fff0f5 100%);
-      font-family: 'Quicksand', sans-serif;
-      color: #5a3e4b;
-      overflow-x: hidden;
-      position: relative;
+      font-family: "Work Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(34, 197, 94, 0.18), transparent 60%),
+        radial-gradient(900px 600px at 110% 20%, rgba(56, 189, 248, 0.18), transparent 55%),
+        linear-gradient(180deg, #f8fafc 0%, #f1f5f9 60%, #f8fafc 100%);
+      color: #0b1220;
     }
 
-    .sparkle-trail {
-      position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #ff85a1;
-      box-shadow: 0 0 6px #ff85a1, 0 0 12px #ffc2d1;
-      animation: sparkleFade 0.6s ease-out forwards;
+    .map-grid {
+      background-image:
+        linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+      background-size: 64px 64px;
     }
 
-    @keyframes sparkleFade {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(0) translateY(-20px); opacity: 0; }
+    .crosswalk-bar {
+      background: repeating-linear-gradient(90deg, #f8fafc 0 18px, #111827 18px 34px);
     }
 
-    .floaters-bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
+    .route-dash {
+      background: repeating-linear-gradient(90deg, #facc15 0 16px, transparent 16px 28px);
     }
 
-    .floating-bunny {
-      position: absolute;
-      bottom: -80px;
-      opacity: 0;
-      animation: floatUp linear infinite;
+    .glow-node {
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.12), 0 0 22px rgba(34, 197, 94, 0.35);
     }
 
-    .mini-bunny {
-      position: relative;
-      width: 24px;
-      height: 28px;
-      background: #ffb6c1;
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    .float-card {
+      animation: floatCard 10s ease-in-out infinite alternate;
     }
 
-    .mini-bunny::before, .mini-bunny::after {
-      content: '';
-      position: absolute;
-      width: 8px;
-      height: 18px;
-      background: #ffb6c1;
-      border-radius: 50%;
-      top: -14px;
+    @keyframes floatCard {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
     }
 
-    .mini-bunny::before { left: 3px; transform: rotate(-8deg); }
-    .mini-bunny::after { right: 3px; transform: rotate(8deg); }
-
-    .mini-bunny .ear-inner-l, .mini-bunny .ear-inner-r {
-      position: absolute;
-      width: 4px;
-      height: 10px;
-      background: #ff8fa3;
-      border-radius: 50%;
-      top: -11px;
-      z-index: 1;
-    }
-
-    .mini-bunny .ear-inner-l { left: 5px; transform: rotate(-8deg); }
-    .mini-bunny .ear-inner-r { right: 5px; transform: rotate(8deg); }
-
-    @keyframes floatUp {
-      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10%  { opacity: 0.45; }
-      90%  { opacity: 0.45; }
-      100% { transform: translateY(-110vh) rotate(15deg); opacity: 0; }
-    }
-
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.18;
-      z-index: 0;
-      animation: drift 14s ease-in-out infinite alternate;
-    }
-
-    .orb-1 { width: 400px; height: 400px; background: #ffb6c1; top: -100px; left: -100px; }
-    .orb-2 { width: 350px; height: 350px; background: #98d4a2; bottom: -80px; right: -80px; animation-delay: -5s; }
-    .orb-3 { width: 250px; height: 250px; background: #ffc2d1; top: 30%; left: 55%; animation-delay: -9s; }
-    .orb-4 { width: 200px; height: 200px; background: #c9e8cd; top: 60%; right: 20%; animation-delay: -7s; }
-
-    @keyframes drift {
-      to { transform: translate(50px, 30px); }
-    }
-
-    .content {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    .keroppi {
-      position: relative;
-      width: 100px;
-      height: 90px;
-      margin: 0 auto 0.5rem;
-      animation: hopHop 1.5s ease-in-out infinite;
-    }
-
-    .keroppi-body {
-      width: 80px;
-      height: 60px;
-      background: #6abf69;
-      border-radius: 50%;
-      position: absolute;
-      bottom: 0;
-      left: 10px;
-    }
-
-    .keroppi-eye-l, .keroppi-eye-r {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      background: #fff;
-      border-radius: 50%;
-      top: -8px;
-      border: 2px solid #3a7a39;
-    }
-
-    .keroppi-eye-l { left: 8px; }
-    .keroppi-eye-r { right: 8px; }
-
-    .keroppi-pupil-l, .keroppi-pupil-r {
-      position: absolute;
-      width: 12px;
-      height: 14px;
-      background: #1a1a2e;
-      border-radius: 50%;
-      top: 6px;
-    }
-
-    .keroppi-pupil-l { left: 14px; }
-    .keroppi-pupil-r { right: 14px; }
-
-    .keroppi-pupil-l::after, .keroppi-pupil-r::after {
-      content: '';
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #fff;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-    }
-
-    .keroppi-mouth {
-      position: absolute;
-      width: 30px;
-      height: 12px;
-      border-bottom: 3px solid #3a7a39;
-      border-radius: 0 0 50% 50%;
-      bottom: 16px;
-      left: 25px;
-    }
-
-    .keroppi-cheek-l, .keroppi-cheek-r {
-      position: absolute;
-      width: 14px;
-      height: 8px;
-      background: #ff9eae;
-      border-radius: 50%;
-      bottom: 18px;
-      opacity: 0.7;
-    }
-
-    .keroppi-cheek-l { left: 10px; }
-    .keroppi-cheek-r { right: 10px; }
-
-    @keyframes hopHop {
-      0%, 100% { transform: translateY(0); }
-      30%      { transform: translateY(-12px); }
-      50%      { transform: translateY(0); }
-      70%      { transform: translateY(-8px); }
-    }
-
-    .bunny {
-      position: relative;
-      width: 120px;
-      height: 150px;
-      margin: 0.5rem auto;
-      animation: bunnyBounce 1.2s ease-in-out infinite;
-      cursor: pointer;
-    }
-
-    .bunny:hover .bunny-cheek-l,
-    .bunny:hover .bunny-cheek-r {
-      opacity: 1;
-      transform: scale(1.3);
-    }
-
-    .bunny-head {
-      width: 100px;
-      height: 90px;
-      background: #fff;
-      border-radius: 50%;
-      position: absolute;
-      bottom: 0;
-      left: 10px;
-      box-shadow: inset 0 -5px 15px rgba(255, 182, 193, 0.3);
-    }
-
-    .bunny-ear-l, .bunny-ear-r {
-      position: absolute;
-      width: 26px;
-      height: 65px;
-      background: #fff;
-      border-radius: 50%;
-      top: -45px;
-      box-shadow: inset 0 0 10px rgba(255, 182, 193, 0.2);
-    }
-
-    .bunny-ear-l { left: 18px; transform: rotate(-12deg); }
-    .bunny-ear-r { right: 18px; transform: rotate(12deg); }
-
-    .bunny-ear-inner-l, .bunny-ear-inner-r {
-      position: absolute;
-      width: 12px;
-      height: 40px;
-      background: #ffb6c1;
-      border-radius: 50%;
-      top: -35px;
-    }
-
-    .bunny-ear-inner-l { left: 25px; transform: rotate(-12deg); }
-    .bunny-ear-inner-r { right: 25px; transform: rotate(12deg); }
-
-    .bunny-eye-l, .bunny-eye-r {
-      position: absolute;
-      width: 10px;
-      height: 12px;
-      background: #2d1b30;
-      border-radius: 50%;
-      bottom: 40px;
-    }
-
-    .bunny-eye-l { left: 32px; }
-    .bunny-eye-r { right: 32px; }
-
-    .bunny-eye-l::after, .bunny-eye-r::after {
-      content: '';
-      position: absolute;
-      width: 3px;
-      height: 3px;
-      background: #fff;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-    }
-
-    .bunny-nose {
-      position: absolute;
-      width: 10px;
-      height: 7px;
-      background: #ffb6c1;
-      border-radius: 50%;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .bunny-mouth {
-      position: absolute;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 16px;
-      height: 8px;
-      border-bottom: 2px solid #d4919e;
-      border-radius: 0 0 50% 50%;
-    }
-
-    .bunny-cheek-l, .bunny-cheek-r {
-      position: absolute;
-      width: 16px;
-      height: 10px;
-      background: #ffc2d1;
-      border-radius: 50%;
-      bottom: 28px;
-      opacity: 0.6;
-      transition: all 0.3s;
-    }
-
-    .bunny-cheek-l { left: 14px; }
-    .bunny-cheek-r { right: 14px; }
-
-    @keyframes bunnyBounce {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-15px); }
-    }
-
-    h1 {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(2.5rem, 8vw, 4.5rem);
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-      background: linear-gradient(135deg, #ff758f, #ff4d6d, #ff85a1, #ffc2d1);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 4s ease-in-out infinite;
-      letter-spacing: 1px;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { background-position: 0% 50%; }
-      50%      { background-position: 100% 50%; }
-    }
-
-    .subtitle {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
-      color: #c47a90;
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeInUp 1s ease forwards 0.5s;
-      line-height: 1.6;
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .buttons {
-      display: flex;
-      gap: 1.5rem;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeInUp 1s ease forwards 1s;
-    }
-
-    .btn-yes {
-      padding: 16px 52px;
-      background: linear-gradient(135deg, #ff85a1, #ff4d6d);
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      font-family: 'Caveat', cursive;
-      font-size: 1.5rem;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(255, 77, 109, 0.3);
-    }
-
-    .btn-yes:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 30px rgba(255, 77, 109, 0.5);
-    }
-
-    .btn-no {
-      padding: 12px 32px;
-      background: #fff;
-      color: #b07a8a;
-      border: 2px solid #e8b4c8;
-      border-radius: 50px;
-      font-family: 'Caveat', cursive;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .music-toggle {
-      position: fixed;
-      top: 1.2rem;
-      right: 1.2rem;
-      z-index: 500;
-      background: rgba(255, 255, 255, 0.85);
-      border: 2px solid #e8b4c8;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      cursor: pointer;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      backdrop-filter: blur(8px);
-      color: #ff85a1;
-    }
-
-    .music-toggle:hover { transform: scale(1.1); background: #fff; }
-
-    .yes-screen {
-      display: none;
-      text-align: center;
-      width: 100%;
-      max-width: 1200px;
-      padding: 2rem 1rem;
-    }
-
-    .yes-screen.active {
-      display: block;
-      animation: fadeInUp 0.8s ease forwards;
-    }
-
-    .yes-text {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      background: linear-gradient(135deg, #ff758f, #ffc2d1, #ff4d6d);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s ease-in-out infinite;
-      margin-top: 0.5rem;
-      line-height: 1.4;
-    }
-
-    .yes-sub {
-      font-family: 'Caveat', cursive;
-      color: #c47a90;
-      font-size: clamp(1.2rem, 3vw, 1.5rem);
-      margin-top: 0.8rem;
-    }
-
-    /* Love notes - glassmorphism cards */
-    .love-notes {
-      margin: 3rem auto 2rem;
-      max-width: 800px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.4rem;
-      padding: 0 1rem;
-    }
-
-    .love-note {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 182, 193, 0.3);
-      border-radius: 20px;
-      padding: 1.6rem 1.4rem;
-      font-family: 'Caveat', cursive;
-      font-size: 1.25rem;
-      color: #7a4a5a;
-      box-shadow: 0 8px 32px rgba(180, 120, 140, 0.1);
-      transform: rotate(var(--rot, -2deg));
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-      opacity: 0;
-      animation: noteIn 0.5s ease forwards;
-      position: relative;
-      line-height: 1.5;
-      overflow: hidden;
-    }
-
-    .love-note::before {
-      content: '';
-      position: absolute;
-      top: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 14px;
-      background: rgba(255, 182, 193, 0.5);
-      border-radius: 2px;
-    }
-
-    .love-note::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
-      transition: transform 0.6s;
-      transform: translateX(-100%);
-    }
-
-    .love-note:hover::after {
-      transform: translateX(100%);
-    }
-
-    .love-note:hover {
-      transform: rotate(0deg) scale(1.06) translateY(-4px);
-      box-shadow: 0 12px 40px rgba(255, 133, 161, 0.2);
-    }
-
-    .love-note-emoji {
-      display: block;
-      font-size: 1.6rem;
-      margin-bottom: 0.4rem;
-    }
-
-    @keyframes noteIn {
-      from { opacity: 0; transform: rotate(var(--rot, -2deg)) translateY(20px) scale(0.9); }
-      to { opacity: 1; transform: rotate(var(--rot, -2deg)) translateY(0) scale(1); }
-    }
-
-    .section-header {
-      margin: 2.5rem 0 0.5rem;
-    }
-
-    .love-notes-title, .gallery-title {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
-      color: #ff85a1;
-      letter-spacing: 1px;
-    }
-
-    .love-notes-sub, .gallery-sub {
-      font-family: 'Caveat', cursive;
-      color: #c47a90;
-      font-size: 1.1rem;
-      margin-top: 0.2rem;
-      margin-bottom: 1rem;
-    }
-
-    /* Photo gallery - modern polaroid */
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 2rem;
-      width: 100%;
-      padding: 0 1rem 3rem;
-    }
-
-    .polaroid {
-      background: #fff;
-      border-radius: 12px;
-      padding: 10px 10px 0 10px;
-      box-shadow: 0 4px 24px rgba(180, 120, 140, 0.12);
-      transform: rotate(var(--rot, 0deg));
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-      cursor: pointer;
-      opacity: 0;
-      animation: polaroidIn 0.6s ease forwards;
-      overflow: hidden;
-    }
-
-    .polaroid:hover {
-      transform: rotate(0deg) scale(1.03) translateY(-6px);
-      box-shadow: 0 16px 48px rgba(255, 133, 161, 0.25);
-    }
-
-    .polaroid img {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      display: block;
-      border-radius: 8px;
-      transition: transform 0.4s ease;
-    }
-
-    .polaroid:hover img {
-      transform: scale(1.02);
-    }
-
-    .polaroid-caption {
-      font-family: 'Caveat', cursive;
-      font-size: 1.15rem;
-      color: #7a4a5a;
-      padding: 12px 6px 16px;
-      text-align: center;
-      min-height: 44px;
-      line-height: 1.3;
-    }
-
-    @keyframes polaroidIn {
-      from { opacity: 0; transform: rotate(var(--rot, 0deg)) translateY(40px) scale(0.9); }
-      to { opacity: 1; transform: rotate(var(--rot, 0deg)) translateY(0) scale(1); }
-    }
-
-    /* Lightbox */
-    .lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(90, 62, 75, 0.92);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 2rem;
-      backdrop-filter: blur(8px);
-    }
-
-    .lightbox.active { display: flex; flex-direction: column; }
-
-    .lightbox img {
-      max-width: 90vw;
-      max-height: 75vh;
-      border-radius: 12px;
-      box-shadow: 0 0 60px rgba(255, 133, 161, 0.3);
-      animation: lightboxIn 0.3s ease;
-      border: 6px solid #fff;
-    }
-
-    .lightbox-caption {
-      font-family: 'Caveat', cursive;
-      color: #ffc2d1;
-      font-size: 1.5rem;
-      margin-top: 1rem;
-      text-align: center;
-    }
-
-    @keyframes lightboxIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .lightbox-close {
-      position: fixed;
-      top: 1.5rem;
-      right: 2rem;
-      font-size: 2rem;
-      color: #ffc2d1;
-      cursor: pointer;
-      z-index: 1001;
-      transition: transform 0.2s;
-    }
-
-    .lightbox-close:hover { transform: scale(1.2); }
-
-    .lightbox-nav {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2.5rem;
-      color: #ffc2d1;
-      cursor: pointer;
-      z-index: 1001;
-      padding: 1rem;
-      transition: transform 0.2s;
-      user-select: none;
-    }
-
-    .lightbox-nav:hover { transform: translateY(-50%) scale(1.2); }
-    .lightbox-prev { left: 1rem; }
-    .lightbox-next { right: 1rem; }
-
-    #confetti {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .scroll-hint {
-      margin-top: 2rem;
-      color: #c47a90;
-      font-family: 'Caveat', cursive;
-      font-size: 1.1rem;
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    .scroll-hint span { display: block; font-size: 1.8rem; }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(8px); }
-    }
-
-    .cute-divider {
-      margin: 1.5rem auto;
-      font-family: 'Caveat', cursive;
-      color: #e8b4c8;
-      font-size: 1.5rem;
-      letter-spacing: 8px;
-    }
-
-    @media (max-width: 600px) {
-      .gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-      }
-      .love-notes {
-        grid-template-columns: 1fr;
-      }
-      .keroppi { transform: scale(0.8); }
-      .bunny { transform: scale(0.85); }
-      .polaroid { padding: 6px 6px 0 6px; border-radius: 8px; }
-      .polaroid img { border-radius: 6px; }
-      .polaroid-caption { font-size: 0.95rem; padding: 8px 2px 10px; }
+    @media (prefers-reduced-motion: reduce) {
+      .float-card { animation: none; }
     }
   </style>
 </head>
-<body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="orb orb-4"></div>
-  <div class="floaters-bg" id="floatersBg"></div>
-  <canvas id="confetti"></canvas>
-  <button class="music-toggle" id="musicToggle" title="Toggle music">&#9835;</button>
+<body class="min-h-screen">
+  <div id="root"></div>
 
-  <div class="lightbox" id="lightbox">
-    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
-    <div class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">&#10094;</div>
-    <div class="lightbox-nav lightbox-next" onclick="navLightbox(1)">&#10095;</div>
-    <img id="lightboxImg" src="" alt="">
-    <div class="lightbox-caption" id="lightboxCaption"></div>
-  </div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <div class="content" id="askScreen">
-    <div class="keroppi">
-      <div class="keroppi-body">
-        <div class="keroppi-eye-l"><div class="keroppi-pupil-l"></div></div>
-        <div class="keroppi-eye-r"><div class="keroppi-pupil-r"></div></div>
-        <div class="keroppi-mouth"></div>
-        <div class="keroppi-cheek-l"></div>
-        <div class="keroppi-cheek-r"></div>
-      </div>
-    </div>
+  <script type="text/babel">
+    const { useEffect, useMemo, useState } = React;
 
-    <div class="bunny">
-      <div class="bunny-head">
-        <div class="bunny-ear-l"></div>
-        <div class="bunny-ear-r"></div>
-        <div class="bunny-ear-inner-l"></div>
-        <div class="bunny-ear-inner-r"></div>
-        <div class="bunny-eye-l"></div>
-        <div class="bunny-eye-r"></div>
-        <div class="bunny-nose"></div>
-        <div class="bunny-mouth"></div>
-        <div class="bunny-cheek-l"></div>
-        <div class="bunny-cheek-r"></div>
-      </div>
-    </div>
-
-    <h1>Will You Be My Valentine?</h1>
-    <p class="subtitle">I like you more than steak... and that's saying a lot.</p>
-
-    <div class="buttons">
-      <button class="btn-yes" id="yesBtn" onclick="sayYes()">Yes please!</button>
-      <button class="btn-no" id="noBtn">No</button>
-    </div>
-  </div>
-
-  <div class="content yes-screen" id="yesScreen">
-    <div class="keroppi" style="margin-bottom:0.5rem">
-      <div class="keroppi-body">
-        <div class="keroppi-eye-l"><div class="keroppi-pupil-l"></div></div>
-        <div class="keroppi-eye-r"><div class="keroppi-pupil-r"></div></div>
-        <div class="keroppi-mouth"></div>
-        <div class="keroppi-cheek-l"></div>
-        <div class="keroppi-cheek-r"></div>
-      </div>
-    </div>
-
-    <div class="yes-text">YAYYYYYYY!!!! love you bun</div>
-
-    <div class="scroll-hint">
-      <span>&#x2193;</span>
-    </div>
-
-    <div class="gallery" id="gallery"></div>
-  </div>
-
-  <script>
-    const floatersBg = document.getElementById('floatersBg');
-    const noBtn = document.getElementById('noBtn');
-    const yesBtn = document.getElementById('yesBtn');
-    let noCount = 0;
-    let currentLightboxIndex = 0;
-    let musicPlaying = false;
-    let audioCtx = null;
-
-    const photos = [
-      { file: 'images/cookingwithyou.jpg', caption: 'cooking with you' },
-      { file: 'images/dintaifungyayy.jpg', caption: 'din tai fung yayy' },
-      { file: 'images/eatinguniinkanazawa.jpg', caption: 'eating uni in kanazawa' },
-      { file: 'images/kimonoinkyoto.jpg', caption: 'kimono in kyoto' },
-      { file: 'images/meinkanazawa.JPG', caption: 'me in kanazawa' },
-      { file: 'images/moreswan.jpg', caption: 'more swan' },
-      { file: 'images/nationalgirlfriendsday.jpg', caption: 'national girlfriends day' },
-      { file: 'images/pokemonbun.jpg', caption: 'pokemon bun!' },
-      { file: 'images/snowinnagano.jpg', caption: 'snow in nagano' },
-      { file: 'images/swan.jpg', caption: 'swan' },
-      { file: 'images/urcousinsbirthday.jpg', caption: 'ur cousins birthday' },
-      { file: 'images/us@source.jpg', caption: 'us @ source' },
-      { file: 'images/usatfogodechao.jpg', caption: 'us at fogo de chao' },
-      { file: 'images/usmakingasteak.jpg', caption: 'us making a steak' },
-      { file: 'images/usonboatatnaplesisland.JPG', caption: 'us on boat at naples island' },
-      { file: 'images/usoncouch.jpg', caption: 'us on couch' },
-      { file: 'images/ussleeping.jpg', caption: 'us sleeping' },
-      { file: 'images/valentineflowers.JPG', caption: 'valentine flowers' },
-      { file: 'images/youinjapaninnara.jpg', caption: 'you in japan in nara' },
-      { file: 'images/youinkanazawagarden.JPG', caption: 'you in kanazawa garden' },
-      { file: 'images/youinobuse.JPG', caption: 'you in obuse' },
-      { file: 'images/yourvalentinesgifttome.jpg', caption: 'your valentines gift to me' },
+    const navItems = [
+      { id: "home", label: "Home" },
+      { id: "data", label: "Data" },
+      { id: "narrative", label: "Narrative" },
+      { id: "case-study", label: "Case Study" },
+      { id: "methods", label: "Methods" },
+      { id: "team", label: "Team" },
+      { id: "resources", label: "Resources" },
     ];
 
-    // Shuffle photos
-    for (let i = photos.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [photos[i], photos[j]] = [photos[j], photos[i]];
-    }
-
-    const loveNoteTexts = [
-      { text: 'Cooking together and pretending we\'re on a cooking show', icon: '\u{1F373}' },
-      { text: 'That time we ate uni in Kanazawa and you couldn\'t stop smiling', icon: '\u{1F363}' },
-      { text: 'Wearing kimonos in Kyoto like we belonged there', icon: '\u{1F338}' },
-      { text: 'Snow day in Nagano, your nose was so red and so cute', icon: '\u{2744}\u{FE0F}' },
-      { text: 'Din Tai Fung runs that turn into 2 hour date nights', icon: '\u{1F95F}' },
-      { text: 'Making steak together like we actually know what we\'re doing', icon: '\u{1F525}' },
-      { text: 'Boat days at Naples Island, you + water + sun = perfect', icon: '\u{26F5}' },
-      { text: 'Couch nights where we don\'t need to go anywhere to be happy', icon: '\u{1F6CB}\u{FE0F}' },
-      { text: 'You finding the Pokemon bun and being way too excited about it', icon: '\u{2B50}' },
-      { text: 'Fogo de Chao dates where we both eat way too much', icon: '\u{1F969}' },
-      { text: 'You in the Kanazawa garden looking like a painting', icon: '\u{1F33F}' },
-      { text: 'Every single moment in Japan with you was a movie', icon: '\u{1F5FE}' },
+    const storySteps = [
+      {
+        id: "q1",
+        title: "Question 1: Where is walkability highest and lowest?",
+        body:
+          "We start with a regional map of the National Walkability Index by Census block group. A diverging palette shows high scores in darker tones and low scores in lighter tones. Hover reveals the block group name and score.",
+        figure: "Figure 1: Walkability Index map (LA-LB CSA)",
+      },
+      {
+        id: "q2",
+        title: "Question 2: Who is most affected by low walkability?",
+        body:
+          "We compare walkability across neighborhood types and mobility constraints. Early patterns suggest modest differences by age composition, but strong mismatches between car-free rates and transit access.",
+        figure: "Figure 2: Car-free households vs transit access (scatter)",
+      },
+      {
+        id: "q3",
+        title: "Question 3: How does history shape these patterns?",
+        body:
+          "We connect present-day walkability to historical planning decisions, land use, and infrastructure investment that structured who benefits from safe, walkable streets.",
+        figure: "Figure 3: Timeline of key planning milestones",
+      },
     ];
 
-    const noMessages = [
-      'No',
-      'wait... really?',
-      'are you sure about that?',
-      'think about it...',
-      'pretty please?',
-      'with a cherry on top?',
-      'i\'ll share my fries...',
-      'i\'ll let you pick the movie...',
-      'you\'re really doing this to me',
-      'my bunny heart is breaking',
-      'ok last chance... pls?',
+    const dataSources = [
+      {
+        name: "EPA Smart Location Database (SLD)",
+        detail: "Block-group walkability index and built-environment measures.",
+      },
+      {
+        name: "Census / ACS 2019",
+        detail: "Population, income, and household context joined to SLD geographies.",
+      },
+      {
+        name: "Transit access (GTFS)",
+        detail: "Transit stop proximity and service access inputs inside SLD.",
+      },
+      {
+        name: "LEHD employment",
+        detail: "Job density and employment mix used in walkability scoring.",
+      },
     ];
 
-    noBtn.addEventListener('click', () => {
-      noCount++;
-      noBtn.textContent = noMessages[Math.min(noCount, noMessages.length - 1)];
-      noBtn.style.transform = `scale(${Math.max(0.4, 1 - noCount * 0.08)})`;
-      yesBtn.style.transform = `scale(${1 + noCount * 0.15})`;
-      yesBtn.style.fontSize = `${1.5 + noCount * 0.12}rem`;
-      const maxX = window.innerWidth - noBtn.offsetWidth - 40;
-      const maxY = window.innerHeight - noBtn.offsetHeight - 40;
-      noBtn.style.position = 'fixed';
-      noBtn.style.left = Math.floor(Math.random() * maxX) + 'px';
-      noBtn.style.top = Math.floor(Math.random() * maxY) + 'px';
-      noBtn.style.zIndex = '100';
-    });
+    const toolList = [
+      {
+        name: "Tableau",
+        reason: "Interactive dashboards and quick regional comparisons.",
+        color: "border-sky-200 bg-sky-50",
+      },
+      {
+        name: "Python",
+        reason: "Cleaning, joins, statistics, and repeatable charts.",
+        color: "border-emerald-200 bg-emerald-50",
+      },
+      {
+        name: "ArcGIS",
+        reason: "Geographic mapping and boundary work.",
+        color: "border-amber-200 bg-amber-50",
+      },
+    ];
 
-    function sayYes() {
-      document.getElementById('askScreen').style.display = 'none';
-      noBtn.style.display = 'none';
-      document.body.style.overflow = 'auto';
-      document.getElementById('yesScreen').classList.add('active');
-      for (let i = 0; i < 30; i++) setTimeout(() => createFloater(), i * 80);
-      launchConfetti();
-      buildLoveNotes();
-      buildGallery();
+    function useScrollProgress() {
+      const [progress, setProgress] = useState(0);
+      useEffect(() => {
+        const onScroll = () => {
+          const doc = document.documentElement;
+          const total = doc.scrollHeight - doc.clientHeight;
+          const pct = total > 0 ? (doc.scrollTop / total) * 100 : 0;
+          setProgress(pct);
+        };
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+      }, []);
+      return progress;
     }
 
-    function buildLoveNotes() {
-      const container = document.getElementById('loveNotes');
-      if (!container) return;
-      loveNoteTexts.forEach((item, i) => {
-        const note = document.createElement('div');
-        note.classList.add('love-note');
-        const rot = (Math.random() - 0.5) * 5;
-        note.style.setProperty('--rot', `${rot}deg`);
-        note.style.animationDelay = `${i * 0.1}s`;
-        note.innerHTML = `<span class="love-note-emoji">${item.icon}</span>${item.text}`;
-        container.appendChild(note);
-      });
-    }
-
-    function buildGallery() {
-      const gallery = document.getElementById('gallery');
-      photos.forEach(({ file, caption }, i) => {
-        const pol = document.createElement('div');
-        pol.classList.add('polaroid');
-        const rot = (Math.random() - 0.5) * 4;
-        pol.style.setProperty('--rot', `${rot}deg`);
-        pol.style.animationDelay = `${i * 0.07}s`;
-        pol.innerHTML = `
-          <img src="${file}" alt="${caption}" loading="lazy">
-          <div class="polaroid-caption">${caption}</div>
-        `;
-        pol.addEventListener('click', () => openLightbox(i));
-        gallery.appendChild(pol);
-      });
-    }
-
-    function openLightbox(index) {
-      currentLightboxIndex = index;
-      document.getElementById('lightboxImg').src = photos[index].file;
-      document.getElementById('lightboxCaption').textContent = photos[index].caption;
-      document.getElementById('lightbox').classList.add('active');
-    }
-
-    function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('active');
-    }
-
-    function navLightbox(dir) {
-      event.stopPropagation();
-      currentLightboxIndex = (currentLightboxIndex + dir + photos.length) % photos.length;
-      document.getElementById('lightboxImg').src = photos[currentLightboxIndex].file;
-      document.getElementById('lightboxCaption').textContent = photos[currentLightboxIndex].caption;
-    }
-
-    document.getElementById('lightbox').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) closeLightbox();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (!document.getElementById('lightbox').classList.contains('active')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') navLightbox(-1);
-      if (e.key === 'ArrowRight') navLightbox(1);
-    });
-
-    function createFloater() {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('floating-bunny');
-      const size = 0.5 + Math.random() * 0.7;
-      wrapper.style.left = Math.random() * 100 + '%';
-      wrapper.style.animationDuration = (10 + Math.random() * 12) + 's';
-      wrapper.style.transform = `scale(${size})`;
-      wrapper.innerHTML = `<div class="mini-bunny"><div class="ear-inner-l"></div><div class="ear-inner-r"></div></div>`;
-      floatersBg.appendChild(wrapper);
-      setTimeout(() => wrapper.remove(), 22000);
-    }
-
-    for (let i = 0; i < 6; i++) setTimeout(() => createFloater(), i * 700);
-    setInterval(createFloater, 2500);
-
-    let lastSparkle = 0;
-    document.addEventListener('mousemove', (e) => {
-      const now = Date.now();
-      if (now - lastSparkle < 50) return;
-      lastSparkle = now;
-      const sparkle = document.createElement('div');
-      sparkle.classList.add('sparkle-trail');
-      sparkle.style.left = e.clientX + (Math.random() - 0.5) * 10 + 'px';
-      sparkle.style.top = e.clientY + (Math.random() - 0.5) * 10 + 'px';
-      const size = 3 + Math.random() * 5;
-      sparkle.style.width = size + 'px';
-      sparkle.style.height = size + 'px';
-      document.body.appendChild(sparkle);
-      setTimeout(() => sparkle.remove(), 600);
-    });
-
-    function launchConfetti() {
-      const canvas = document.getElementById('confetti');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const pieces = [];
-      const colors = ['#ffb6c1', '#ffc2d1', '#ffd6e0', '#98d4a2', '#b8e6be', '#fff', '#ff85a1', '#ffe4ec'];
-      for (let i = 0; i < 250; i++) {
-        pieces.push({
-          x: canvas.width / 2, y: canvas.height / 2,
-          vx: (Math.random() - 0.5) * 24, vy: (Math.random() - 0.5) * 24 - 6,
-          w: 5 + Math.random() * 8, h: 3 + Math.random() * 6,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15,
-          gravity: 0.12 + Math.random() * 0.1, opacity: 1,
+    function useActiveSection(sectionIds) {
+      const [active, setActive] = useState(sectionIds[0]);
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) setActive(entry.target.id);
+            });
+          },
+          { rootMargin: "-40% 0px -50% 0px" }
+        );
+        sectionIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) observer.observe(el);
         });
-      }
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let alive = false;
-        for (const p of pieces) {
-          p.vy += p.gravity; p.x += p.vx; p.y += p.vy;
-          p.rot += p.rotSpeed; p.vx *= 0.99; p.opacity -= 0.0025;
-          if (p.opacity <= 0) continue;
-          alive = true;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate((p.rot * Math.PI) / 180);
-          ctx.globalAlpha = p.opacity;
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          ctx.restore();
-        }
-        if (alive) requestAnimationFrame(animate);
-      }
-      animate();
+        return () => observer.disconnect();
+      }, [sectionIds]);
+      return active;
     }
 
-    window.addEventListener('resize', () => {
-      const c = document.getElementById('confetti');
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
-    });
+    function App() {
+      const sectionIds = useMemo(() => navItems.map((item) => item.id), []);
+      const progress = useScrollProgress();
+      const active = useActiveSection(sectionIds);
 
-    let musicInterval = null;
-    let gainNode = null;
+      return (
+        <div className="map-grid">
+          <div
+            className="fixed top-0 left-0 h-1 bg-park z-50"
+            style={{ width: `${progress}%` }}
+          />
 
-    function startMusic() {
-      if (audioCtx) { audioCtx.resume(); musicPlaying = true; updateMusicBtn(); return; }
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      gainNode = audioCtx.createGain();
-      gainNode.gain.value = 0.1;
-      gainNode.connect(audioCtx.destination);
+          <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+            <div className="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center gap-4 justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-asphalt text-crosswalk flex items-center justify-center font-display text-lg">
+                  LA
+                </div>
+                <div>
+                  <div className="font-display text-lg">Walkability in Los Angeles</div>
+                  <div className="text-xs text-slate-500">Built environment, equity, and access</div>
+                </div>
+              </div>
+              <nav className="flex flex-wrap gap-2 text-sm font-medium">
+                {navItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    className={`px-3 py-1.5 rounded-full border transition ${
+                      active === item.id
+                        ? "bg-asphalt text-crosswalk border-asphalt"
+                        : "bg-white text-slate-600 border-slate-200 hover:border-asphalt"
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </header>
 
-      const melody = [
-        { note: 'E5', dur: 0.25 }, { note: 'G5', dur: 0.25 },
-        { note: 'A5', dur: 0.5 },  { note: 'G5', dur: 0.25 },
-        { note: 'E5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
-        { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.25 },
-        { note: 'E5', dur: 0.5 },  { note: 'G5', dur: 0.25 },
-        { note: 'E5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
-        { note: 'E5', dur: 0.25 }, { note: 'G5', dur: 0.25 },
-        { note: 'A5', dur: 0.25 }, { note: 'B5', dur: 0.25 },
-        { note: 'A5', dur: 0.5 },  { note: 'G5', dur: 0.5 },
-        { note: 'E5', dur: 0.25 }, { note: 'D5', dur: 0.25 },
-        { note: 'C5', dur: 0.75 }, { note: 'R', dur: 0.75 },
-        { note: 'C5', dur: 0.25 }, { note: 'E5', dur: 0.25 },
-        { note: 'G5', dur: 0.5 },  { note: 'A5', dur: 0.25 },
-        { note: 'G5', dur: 0.25 }, { note: 'E5', dur: 0.5 },
-        { note: 'D5', dur: 0.25 }, { note: 'E5', dur: 0.25 },
-        { note: 'G5', dur: 0.5 },  { note: 'E5', dur: 0.25 },
-        { note: 'D5', dur: 0.25 }, { note: 'C5', dur: 0.5 },
-        { note: 'A4', dur: 0.25 }, { note: 'C5', dur: 0.25 },
-        { note: 'E5', dur: 0.5 },  { note: 'D5', dur: 0.25 },
-        { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
-        { note: 'E5', dur: 0.25 }, { note: 'G5', dur: 0.25 },
-        { note: 'A5', dur: 0.75 }, { note: 'R', dur: 0.75 },
-      ];
+          <main className="max-w-6xl mx-auto px-4 pb-20">
+            <section id="home" className="pt-12 pb-10">
+              <div className="grid lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-7 space-y-6">
+                  <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+                    <span className="w-8 h-0.5 bg-slate-300"></span>
+                    Project narrative
+                  </div>
+                  <h1 className="font-display text-4xl md:text-5xl text-ink">
+                    Walkability is not evenly distributed. This project maps who benefits, and why.
+                  </h1>
+                  <p className="text-slate-600 text-lg">
+                    We analyze the EPA Smart Location Database with LA County context to understand how
+                    infrastructure, history, and policy shape access to safe, walkable streets.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href="#narrative"
+                      className="px-5 py-3 rounded-full bg-asphalt text-crosswalk font-semibold shadow-soft"
+                    >
+                      Read the narrative
+                    </a>
+                    <a
+                      href="#data"
+                      className="px-5 py-3 rounded-full border border-slate-300 text-slate-700 font-semibold"
+                    >
+                      View the data
+                    </a>
+                  </div>
+                  <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+                    <span className="px-3 py-1 rounded-full bg-white border border-slate-200">LA County focus</span>
+                    <span className="px-3 py-1 rounded-full bg-white border border-slate-200">Census block groups</span>
+                    <span className="px-3 py-1 rounded-full bg-white border border-slate-200">Equity lens</span>
+                  </div>
+                </div>
+                <div className="lg:col-span-5">
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-soft p-6 space-y-4 float-card">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-display text-xl">Walkability Index Legend</h2>
+                      <span className="text-xs uppercase tracking-[0.2em] text-slate-400">1 to 20</span>
+                    </div>
+                    <div className="h-4 rounded-full bg-gradient-to-r from-slate-200 via-emerald-200 to-emerald-600"></div>
+                    <div className="flex justify-between text-xs text-slate-500">
+                      <span>Lower walkability</span>
+                      <span>Higher walkability</span>
+                    </div>
+                    <div className="border border-slate-200 rounded-xl p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Key questions</div>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-600">
+                        <li>Where are the lowest scoring neighborhoods?</li>
+                        <li>Who lives in those places?</li>
+                        <li>How did historical planning create these patterns?</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-10 h-2 rounded-full crosswalk-bar"></div>
+            </section>
 
-      const freq = {
-        'A4': 440, 'C5': 523.25, 'D5': 587.33,
-        'E5': 659.26, 'G5': 783.99, 'A5': 880, 'B5': 987.77,
-      };
-      const tempo = 0.3;
+            <section id="data" className="py-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-3xl">Data</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Selecting our sources</div>
+              </div>
+              <p className="mt-3 text-slate-600 max-w-3xl">
+                We prioritized datasets that capture walkability, transit access, and neighborhood context
+                at fine geographic scales. These sources allow consistent joins to Census geographies and
+                support equity-focused analysis.
+              </p>
+              <div className="mt-6 grid md:grid-cols-2 gap-4">
+                {dataSources.map((source) => (
+                  <div key={source.name} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
+                    <div className="flex items-start gap-3">
+                      <div className="w-3 h-3 rounded-full bg-park mt-2 glow-node"></div>
+                      <div>
+                        <div className="font-display text-lg">{source.name}</div>
+                        <div className="text-sm text-slate-600 mt-1">{source.detail}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-white">
+                TO DO: Add additional data sources we used.
+              </div>
+            </section>
 
-      function play() {
-        let t = audioCtx.currentTime + 0.05;
-        melody.forEach(({ note, dur }) => {
-          const d = dur * tempo;
-          if (note !== 'R') {
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            o.type = 'sine';
-            o.frequency.value = freq[note];
-            g.gain.setValueAtTime(0.5, t);
-            g.gain.exponentialRampToValueAtTime(0.01, t + d * 2.5);
-            o.connect(g); g.connect(gainNode);
-            o.start(t); o.stop(t + d * 3);
+            <section id="narrative" className="py-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-3xl">Narrative</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Story route</div>
+              </div>
+              <div className="mt-6 grid lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-4">
+                  <div className="sticky top-24 bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Route map</div>
+                      <div className="h-2 w-16 rounded-full route-dash"></div>
+                    </div>
+                    <ol className="mt-4 space-y-4 text-sm text-slate-600">
+                      {storySteps.map((step, index) => (
+                        <li key={step.id} className="flex gap-3">
+                          <span className="w-7 h-7 rounded-full bg-asphalt text-crosswalk flex items-center justify-center text-xs font-semibold">
+                            {index + 1}
+                          </span>
+                          <span>{step.title}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+                <div className="lg:col-span-8 space-y-6">
+                  {storySteps.map((step) => (
+                    <article key={step.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                      <h3 className="font-display text-xl">{step.title}</h3>
+                      <p className="mt-3 text-slate-600">{step.body}</p>
+                      <div className="mt-5 h-48 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-sm text-slate-500">
+                        {step.figure}
+                      </div>
+                    </article>
+                  ))}
+                  <div className="border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-white">
+                    TO DO: Add figures, captions, and links to the interactive visuals.
+                  </div>
+                </div>
+              </div>
+            </section>
 
-            const o2 = audioCtx.createOscillator();
-            const g2 = audioCtx.createGain();
-            o2.type = 'sine';
-            o2.frequency.value = freq[note] * 3;
-            g2.gain.setValueAtTime(0.06, t);
-            g2.gain.exponentialRampToValueAtTime(0.001, t + d * 1.5);
-            o2.connect(g2); g2.connect(gainNode);
-            o2.start(t); o2.stop(t + d * 2);
-          }
-          t += d;
-        });
-        return t - audioCtx.currentTime;
-      }
+            <section id="case-study" className="py-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-3xl">Case Study</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Neighborhood comparison</div>
+              </div>
+              <div className="mt-6 grid lg:grid-cols-2 gap-6">
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Neighborhood A</h3>
+                  <p className="mt-3 text-slate-600">TO DO: Summarize the walkability profile, demographics, and transit access.</p>
+                  <div className="mt-4 h-40 rounded-xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-500">
+                    Add map or chart
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Neighborhood B</h3>
+                  <p className="mt-3 text-slate-600">TO DO: Summarize the contrasting walkability profile and historical context.</p>
+                  <div className="mt-4 h-40 rounded-xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-500">
+                    Add map or chart
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-white">
+                TO DO: Explain why these two neighborhoods were selected.
+              </div>
+            </section>
 
-      const dur = play();
-      musicInterval = setInterval(() => { if (musicPlaying) play(); }, dur * 1000);
-      musicPlaying = true;
-      updateMusicBtn();
+            <section id="methods" className="py-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-3xl">Methods</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Processing and limitations</div>
+              </div>
+              <div className="mt-6 grid lg:grid-cols-2 gap-6">
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Why These Sources?</h3>
+                  <p className="mt-3 text-slate-600">We selected sources that are transparent, replicable, and compatible with Census geographies.</p>
+                  <div className="mt-4 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                    TO DO: Explain reasoning for cited sources.
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Silences and Limitations</h3>
+                  <p className="mt-3 text-slate-600">Every dataset makes tradeoffs. We document what is missing and how it affects interpretation.</p>
+                  <div className="mt-4 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                    TO DO: Talk about limitations we noticed.
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                <h3 className="font-display text-xl">Processing Our Data</h3>
+                <p className="mt-3 text-slate-600">We cleaned, filtered, and aligned multiple sources to focus on LA County block groups.</p>
+                <div className="mt-4 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                  TO DO: Describe how data was cleaned and prepared. Answer these questions:
+                  - What tools were used?
+                  - How clean the data was from the start and what issues had to be fixed?
+                  - How was data filtered to just LA County?
+                </div>
+              </div>
+              <div className="mt-6 grid lg:grid-cols-3 gap-4">
+                {toolList.map((tool) => (
+                  <div key={tool.name} className={`border rounded-2xl p-5 shadow-soft ${tool.color}`}>
+                    <div className="font-display text-lg">{tool.name}</div>
+                    <div className="text-sm text-slate-600 mt-2">{tool.reason}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-white">
+                TO DO: List the tools you used to create visualizations and why.
+              </div>
+              <div className="mt-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                <h3 className="font-display text-xl">Why We Processed It This Way</h3>
+                <p className="mt-3 text-slate-600">
+                  We chose processing steps that foreground equity questions and avoid erasing neighborhood-level variation.
+                </p>
+                <div className="mt-4 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                  TO DO: Cite class readings to justify your processing decisions. Add 1-2 more citations.
+                </div>
+              </div>
+            </section>
+
+            <section id="team" className="py-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-3xl">Our Team</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">People behind the project</div>
+              </div>
+              <div className="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  {
+                    name: "Sarah Johal",
+                    role: "Project Manager",
+                    bio: "Second-year computer science major from the Bay Area.",
+                  },
+                  {
+                    name: "Quinn Koch",
+                    role: "Visualization Specialist",
+                    bio: "Fourth-year geography and statistics double major from Berkeley, CA.",
+                  },
+                  {
+                    name: "Sunny Anand",
+                    role: "Web Designer",
+                    bio: "First-year computer science major from the Bay Area.",
+                  },
+                  { name: "(Enter Name)", role: "(Enter Role)", bio: "(Enter Bio)" },
+                  { name: "(Enter Name)", role: "(Enter Role)", bio: "(Enter Bio)" },
+                  { name: "(Enter Name)", role: "(Enter Role)", bio: "(Enter Bio)" },
+                ].map((member) => (
+                  <div key={member.name} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
+                    <div className="text-sm uppercase tracking-[0.2em] text-slate-400">{member.role}</div>
+                    <div className="font-display text-xl mt-2">{member.name}</div>
+                    <p className="mt-3 text-slate-600">{member.bio}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section id="resources" className="py-12">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="font-display text-3xl">Resources</h2>
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">References and acknowledgments</div>
+              </div>
+              <div className="mt-6 grid lg:grid-cols-2 gap-6">
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Bibliography</h3>
+                  <div className="mt-4 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                    TO DO: Add citations and links to sources.
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Acknowledgments</h3>
+                  <p className="mt-3 text-slate-600 font-semibold">Dr. Nicholas Sabo</p>
+                  <div className="mt-2 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                    TO DO: Write 1-2 sentences thanking professor.
+                  </div>
+                  <p className="mt-4 text-slate-600 font-semibold">TA</p>
+                  <div className="mt-2 border border-dashed border-slate-300 rounded-xl p-4 text-sm text-slate-500 bg-slate-50">
+                    TO DO: Thank TA.
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+
+          <footer className="border-t border-slate-200 bg-white/80 backdrop-blur">
+            <div className="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
+              <span>Walkability in Los Angeles - Project site</span>
+              <span>Built with React and Tailwind CSS</span>
+            </div>
+          </footer>
+        </div>
+      );
     }
 
-    function stopMusic() { if (audioCtx) audioCtx.suspend(); musicPlaying = false; updateMusicBtn(); }
-
-    function updateMusicBtn() {
-      document.getElementById('musicToggle').innerHTML = musicPlaying ? '&#9835;' : '&#9834;';
-      document.getElementById('musicToggle').style.opacity = musicPlaying ? '1' : '0.5';
-    }
-
-    document.getElementById('musicToggle').addEventListener('click', () => {
-      musicPlaying ? stopMusic() : startMusic();
-    });
-
-    let musicStarted = false;
-    document.addEventListener('click', () => {
-      if (!musicStarted) { musicStarted = true; startMusic(); }
-    }, { once: false });
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
   </script>
 </body>
 </html>
