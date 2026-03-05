@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About | Walkability in LA County</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1f2937",
+            asphalt: "#0f172a",
+            sand: "#fff7ef",
+            haze: "#f8fafc",
+            sunset: "#f97316",
+            ocean: "#0ea5e9",
+          },
+          fontFamily: {
+            display: ["Sora", "system-ui", "sans-serif"],
+            body: ["Manrope", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            soft: "0 12px 28px rgba(15, 23, 42, 0.12)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: "Manrope", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 520px at 85% -10%, rgba(249, 115, 22, 0.18), transparent 55%),
+        radial-gradient(760px 520px at 0% 0%, rgba(14, 165, 233, 0.16), transparent 60%),
+        linear-gradient(180deg, #fff7ef 0%, #ffffff 48%, #f8fafc 100%);
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center gap-4 justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-md bg-asphalt text-white flex items-center justify-center font-display text-lg">LA</div>
+        <div>
+          <div class="font-display text-lg text-ink">Walkability in LA County</div>
+          <div class="text-xs text-slate-500">Built environment, equity, and access</div>
+        </div>
+      </a>
+      <nav class="flex flex-wrap gap-2 text-sm font-medium">
+        <a href="index.html" class="px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:border-asphalt">Narrative</a>
+        <a href="about.html" class="px-2.5 py-1.5 rounded-md border border-asphalt bg-asphalt text-white">About</a>
+        <a href="critique.html" class="px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:border-asphalt">Data Critique</a>
+        <a href="bibliography.html" class="px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:border-asphalt">Bibliography</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10 space-y-8">
+    <section class="grid lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-7 space-y-5">
+        <div class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+          <span class="w-8 h-0.5 bg-slate-300"></span>
+          About the project
+        </div>
+        <h1 class="font-display text-3xl md:text-4xl text-ink">How we built the project</h1>
+        <p class="text-lg text-slate-600">
+          This page documents the three levels of the digital humanities workflow behind the site:
+          sources, processing, and presentation. It also explains the reasoning behind our design and
+          editorial decisions, along with team roles, bios, and acknowledgments.
+        </p>
+      </div>
+      <div class="lg:col-span-5">
+        <div class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+          <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Project frame</div>
+          <ul class="mt-4 space-y-2 text-sm text-slate-600">
+            <li>Primary dataset: EPA Smart Location Database, joined with ACS context.</li>
+            <li>Geographic scale: LA County census block groups.</li>
+            <li>Core question: how history, access, and environmental burden shape walkability.</li>
+            <li>Presentation strategy: narrative-first site with charts, map, and timeline.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-3 gap-6">
+      <article class="lg:col-span-1 bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Sources</div>
+        <h2 class="mt-2 font-display text-2xl">Level 1</h2>
+        <div class="mt-4 space-y-4 text-sm text-slate-600">
+          <p>
+            Our core dataset is the EPA Smart Location Database (SLD), which calculates the 2019 National
+            Walkability Index at the census block-group level. We paired the SLD with ACS demographic and
+            income variables, then used TIGER/Line geometries for mapping. Supporting context came from
+            the SLD technical documentation, the National Walkability Index user guide, planning history,
+            and scholarship on heat, asthma, parks, segregation, and perceived walkability.
+          </p>
+          <p>
+            We chose these sources because they work at compatible geographic scales and let us hold two
+            things together: the quantifiable built environment and the historical or social forces that the
+            dataset alone does not explain. The EPA data tells us where a neighborhood sits inside a formal
+            walkability metric. The outside scholarship tells us why those patterns matter and what the
+            metric leaves out.
+          </p>
+        </div>
+      </article>
+
+      <article class="lg:col-span-1 bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Processing</div>
+        <h2 class="mt-2 font-display text-2xl">Level 2</h2>
+        <div class="mt-4 space-y-4 text-sm text-slate-600">
+          <p>
+            We used Python, pandas, and geopandas to clean the LA-focused CSV, normalize county codes,
+            filter to LA County, compute deciles and correlations, and export a simplified GeoJSON for the
+            interactive map. Visualization assets were generated as reproducible SVGs and PNGs rather than
+            hand-edited screenshots. This kept the charts tied to the actual data and made revision easier.
+          </p>
+          <p>
+            Our main processing decision was to keep the block group as the analytical unit. We did not
+            collapse the county into tract- or city-level averages because that would erase variation inside
+            neighborhoods and obscure the uneven geography of access. We also joined in demographic context
+            because the native SLD ontology overemphasizes jobs, land-use efficiency, and transit proximity
+            while omitting many forms of inequality that shape everyday mobility.
+          </p>
+        </div>
+      </article>
+
+      <article class="lg:col-span-1 bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Presentation</div>
+        <h2 class="mt-2 font-display text-2xl">Level 3</h2>
+        <div class="mt-4 space-y-4 text-sm text-slate-600">
+          <p>
+            The site is organized around narrative movement rather than dashboard logic. The argument starts
+            with a map and charts, then places those patterns inside a timeline and a longer written
+            interpretation. We used React and Tailwind for the main page, Leaflet for the interactive map,
+            and a hosted TimelineJS embed for historical context. The supporting pages separate methods,
+            critique, and bibliography so readers can move between argument and documentation.
+          </p>
+          <p>
+            Visually, we avoided a dark technical interface because the project is about the civic and human
+            stakes of the built environment, not only its metrics. The palette borrows from LA’s atmosphere:
+            warm sunset tones, pale sand, and clear blue accents. We kept the layout restrained and readable,
+            closer to a publication or exhibit than to a monitoring dashboard.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+      <h2 class="font-display text-2xl">Reasoning and Class Context</h2>
+      <div class="mt-4 space-y-4 text-slate-600">
+        <p>
+          Our workflow follows a critical data humanities approach rather than a purely technical one. We were
+          guided especially by Catherine D&apos;Ignazio and Lauren Klein&apos;s argument in <em>Data Feminism</em>
+          that data practice should account for power, omission, and unequal visibility. That perspective
+          shaped our decision to foreground variables connected to income, car ownership, and neighborhood
+          burden instead of treating the walkability index as self-sufficient.
+        </p>
+        <p>
+          We were also influenced by danah boyd and Kate Crawford&apos;s warning that large datasets can appear
+          socially complete even when they reproduce selective ways of seeing. The SLD is rich in land-use and
+          accessibility metrics, but it cannot capture fear, comfort, disability access, or historical
+          dispossession on its own. Our narrative and critique pages therefore emphasize what the dataset can do
+          and what it cannot do.
+        </p>
+        <p>
+          Finally, our chart design decisions draw on Cole Nussbaumer Knaflic&apos;s emphasis on decluttering and
+          story structure. Instead of showing every possible relationship, we selected charts that answer a
+          specific question in sequence: where walkability is concentrated, how it relates to car ownership and
+          transit access, how it intersects with low-wage labor and income, and how those findings sit inside a
+          longer history of planning and inequality.
+        </p>
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+      <h2 class="font-display text-2xl">Rubric Coverage</h2>
+      <div class="mt-4 grid lg:grid-cols-2 gap-6 text-sm text-slate-600">
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Core requirements</div>
+          <ul class="mt-3 space-y-2">
+            <li>Narrative: main argument and visual story on <a href="index.html#narrative" class="text-sunset hover:underline">the narrative page</a>, with more than 2,000 words across the story sections and long-form interpretation.</li>
+            <li>Timeline: embedded Knight Lab timeline on <a href="index.html#timeline" class="text-sunset hover:underline">the timeline section</a>.</li>
+            <li>Map: interactive Leaflet choropleth on <a href="index.html#map" class="text-sunset hover:underline">the map section</a>.</li>
+            <li>Five or more visualizations: histogram, income quartile boxplot, two scatterplots, decile comparison chart, and correlation heatmap on <a href="index.html" class="text-sunset hover:underline">the main site</a>.</li>
+            <li>Annotated bibliography: dedicated page at <a href="bibliography.html" class="text-sunset hover:underline">Bibliography</a>.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Supporting requirements</div>
+          <ul class="mt-3 space-y-2">
+            <li>About page: sources, processing, presentation, decision rationale, class readings, team bios, responsibilities, and acknowledgments on this page.</li>
+            <li>Data critique: dedicated page at <a href="critique.html" class="text-sunset hover:underline">Data Critique</a> covering ontology, exclusions, interpretive limits, and ideological effects.</li>
+            <li>Illustrations and captions: every chart and map on the main page includes figure captions and source framing.</li>
+            <li>Citations: linked MLA-style citations are included in the narrative and expanded on the bibliography page.</li>
+            <li>Humanities framing: the project treats walkability as a historical and political condition, not only a technical metric.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+      <h2 class="font-display text-2xl">Team</h2>
+      <div class="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <article class="border border-slate-200 rounded p-5 bg-slate-50">
+          <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Project Manager</div>
+          <div class="font-display text-xl mt-2">Sarah Johal</div>
+          <p class="mt-3 text-sm text-slate-600">Second-year computer science major from the Bay Area. Sarah coordinated the project timeline, kept the group aligned on scope, and managed communication around deadlines and deliverables.</p>
+        </article>
+        <article class="border border-slate-200 rounded p-5 bg-slate-50">
+          <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Visualization Specialist</div>
+          <div class="font-display text-xl mt-2">Quinn Koch</div>
+          <p class="mt-3 text-sm text-slate-600">Fourth-year geography and statistics double major from Berkeley, California. Quinn led chart interpretation, spatial reasoning, and helped define the analytical questions the visualizations needed to answer.</p>
+        </article>
+        <article class="border border-slate-200 rounded p-5 bg-slate-50">
+          <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Web Designer &amp; Developer</div>
+          <div class="font-display text-xl mt-2">Sunny Anand</div>
+          <p class="mt-3 text-sm text-slate-600">First-year computer science major from the Bay Area. Sunny focused on site layout, interface implementation, and the presentation layer that turns analysis into a navigable public-facing project.</p>
+        </article>
+        <article class="border border-slate-200 rounded p-5 bg-slate-50">
+          <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Data Specialist</div>
+          <div class="font-display text-xl mt-2">Rohan Bodla</div>
+          <p class="mt-3 text-sm text-slate-600">Rohan handled data-oriented tasks including variable selection, cleaning strategy, and helping the group think through what the Smart Location Database can and cannot support analytically.</p>
+        </article>
+        <article class="border border-slate-200 rounded p-5 bg-slate-50">
+          <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Content Developer</div>
+          <div class="font-display text-xl mt-2">Nicholas Malilay</div>
+          <p class="mt-3 text-sm text-slate-600">Nicholas developed the written narrative, organized sources, and helped connect the site’s data findings to Los Angeles planning history and environmental justice questions.</p>
+        </article>
+        <article class="border border-slate-200 rounded p-5 bg-slate-50">
+          <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Editor</div>
+          <div class="font-display text-xl mt-2">Nicole Brown</div>
+          <p class="mt-3 text-sm text-slate-600">Nicole reviewed writing for clarity and cohesion, helped refine the project’s framing, and worked on making the final prose legible to a broad but educated audience.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-2 gap-6">
+      <article class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <h2 class="font-display text-2xl">Responsibilities</h2>
+        <ul class="mt-4 space-y-2 text-slate-600 text-sm">
+          <li>Sarah Johal: project management, scheduling, team coordination.</li>
+          <li>Sunny Anand: site design, page structure, front-end implementation.</li>
+          <li>Quinn Koch: visualization strategy, map and chart interpretation.</li>
+          <li>Rohan Bodla: data work, variable review, methodological support.</li>
+          <li>Nicholas Malilay: narrative writing, source integration, project framing.</li>
+          <li>Nicole Brown: editing, revision, prose polish, documentation support.</li>
+        </ul>
+      </article>
+
+      <article class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <h2 class="font-display text-2xl">Acknowledgments</h2>
+        <div class="mt-4 space-y-3 text-slate-600 text-sm">
+          <p>
+            We thank Dr. Nicholas Sabo for helping us frame the project as both a data analysis and a
+            humanities argument. His feedback pushed us to connect walkability metrics to history, power,
+            and the politics of urban design.
+          </p>
+          <p>
+            We also thank our teaching team for guidance on data critique, citation practice, and narrative
+            structure throughout the quarter. Their comments helped us move from a collection of charts to a
+            more coherent public-facing interpretation.
+          </p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
+      <span>Walkability in LA County</span>
+      <span>About page</span>
+    </div>
+  </footer>
+</body>
+</html>

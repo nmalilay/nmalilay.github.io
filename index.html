@@ -157,6 +157,13 @@
       { id: "resources", label: "Resources" },
     ];
 
+    const pageLinks = [
+      { href: "index.html", label: "Narrative" },
+      { href: "about.html", label: "About" },
+      { href: "critique.html", label: "Data Critique" },
+      { href: "bibliography.html", label: "Bibliography" },
+    ];
+
     const storySteps = [
       {
         id: "q1",
@@ -404,21 +411,38 @@
                   <div className="text-xs text-slate-500">Built environment, equity, and access</div>
                 </div>
               </div>
-              <nav className="flex flex-wrap gap-2 text-sm font-medium">
-                {navItems.map((item) => (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    className={`px-2.5 py-1.5 rounded-md border transition ${
-                      active === item.id
-                        ? "bg-asphalt text-white border-asphalt"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-asphalt"
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
+              <div className="flex flex-col items-start lg:items-end gap-2">
+                <nav className="flex flex-wrap gap-2 text-sm font-medium">
+                  {pageLinks.map((item) => (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      className={`px-2.5 py-1.5 rounded-md border transition ${
+                        item.href === "index.html"
+                          ? "bg-asphalt text-white border-asphalt"
+                          : "bg-white text-slate-600 border-slate-200 hover:border-asphalt"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </nav>
+                <nav className="flex flex-wrap gap-2 text-sm font-medium">
+                  {navItems.map((item) => (
+                    <a
+                      key={item.id}
+                      href={`#${item.id}`}
+                      className={`px-2.5 py-1.5 rounded-md border transition ${
+                        active === item.id
+                          ? "bg-asphalt text-white border-asphalt"
+                          : "bg-white text-slate-600 border-slate-200 hover:border-asphalt"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </nav>
+              </div>
             </div>
           </header>
 
@@ -582,6 +606,223 @@
                     </article>
                   ))}
                 </div>
+              </div>
+              <div className="mt-8 space-y-6">
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Argument</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      Behind every parcel, corridor, and block group in Los Angeles lies a layered history of land policy,
+                      transportation investment, exclusion, and reinvestment. This project argues that walkability in LA
+                      County is not a neutral description of urban form. It is a historical outcome. The neighborhoods that
+                      score highly on the National Walkability Index are often the places that received sustained access to
+                      destinations, transit, and mixed land uses, while low-scoring neighborhoods often carry the legacy of
+                      separation between homes, jobs, and services. Using the EPA Smart Location Database, linked ACS
+                      variables, and historical planning scholarship, we ask how well contemporary walkability metrics capture
+                      the geography that Angelenos actually inhabit.
+                    </p>
+                    <p>
+                      Our literature review points in a consistent direction. Scholars agree that macro-scale built
+                      environment factors such as density, land-use diversity, street connectivity, and transit access matter
+                      for walking, but they also show that walkability is experienced through smaller and less visible
+                      features. <a href="https://doi.org/10.1016/j.trd.2023.103888" className="text-sunset hover:underline">Donghwan Ki and Zhenhua Chen</a>
+                      demonstrate that micro-level features in Los Angeles can suppress walkability even where broader urban
+                      form appears supportive. <a href="https://doi.org/10.1080/07352166.2017.1360740" className="text-sunset hover:underline">Alessandro Rigolon and collaborators</a>
+                      show that routes to parks in lower-income and minority-majority areas can remain unsafe or uncomfortable
+                      despite formal park access. Those studies reinforce the project’s central claim: the score is useful,
+                      but the score is not the full story.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Reading the Map</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      The first step in the narrative is descriptive. Our countywide map shows that walkability is clustered,
+                      not randomly distributed. High values are concentrated in neighborhoods where the street network is
+                      tighter, land uses are more mixed, and transit connections are more frequent. Low values appear where
+                      block groups are more separated from destinations or organized around auto-oriented movement. The map is
+                      valuable because it makes spatial inequality legible at the block-group scale. Instead of treating LA
+                      County as a single urban condition, it reveals a patchwork of very different mobility environments.
+                    </p>
+                    <p>
+                      But the map also raises a methodological warning. The EPA’s index is built from proxies such as
+                      intersection density, employment and household mix, and distance from transit. Those are strong measures
+                      of urban form, but they are not direct measures of walking behavior, safety, comfort, or freedom from
+                      environmental burden. That limitation matters in Los Angeles, where historical land use decisions and
+                      freeway construction often placed communities of color near heavy traffic, industrial uses, and
+                      disinvestment. The <a href="https://planning.lacity.gov/plans-policies/community-plan-update/housing-element-rezoning-program-news/historical-housing-and" className="text-sunset hover:underline">City of Los Angeles Historical Housing and Land Use Study</a>
+                      and John Fisher’s <a href="https://ladot.lacity.gov/sites/default/files/documents/transportation-topics-and-tales-milestones-in-transportation-history-in-southern-california.pdf" className="text-sunset hover:underline">LADOT transportation history</a>
+                      both show that infrastructure was never only technical. It was political and social from the start.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Transit, Car Ownership, and Urban Form</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      The second visualization compares the share of car-free households to transit access. This is one of the
+                      clearest places where the dataset becomes historically meaningful. A strong positive relationship would
+                      imply that neighborhoods with fewer cars are also the neighborhoods best served by transit. In practice,
+                      the scatter shows a broad tendency in that direction, but it also leaves room for mismatch. Some block
+                      groups have relatively high rates of car-free households without transit access that rises proportionally.
+                      Those cases matter because they represent a gap between need and infrastructure. They suggest that
+                      households may be adapting to cost, housing conditions, or constrained mobility options rather than
+                      enjoying a transit-rich environment by design.
+                    </p>
+                    <p>
+                      This pattern helps answer a humanities question about lived inequality rather than only a technical one
+                      about network efficiency: who is expected to move through the county without a car, and under what
+                      conditions? Research on Los Angeles school travel by <a href="https://doi.org/10.1177/0739456x14522494" className="text-sunset hover:underline">Tridib Banerjee and colleagues</a>
+                      shows that walking is mediated by fear, traffic, and neighborhood disorder, not just by proximity. A
+                      transit stop can exist within walking range and still fail to produce a walkable experience if the route
+                      to it feels unsafe, unpleasant, or physically taxing. That is why the chart is analytically useful: it
+                      shows where access and necessity may diverge.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Income Does Not Explain Everything</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      The third visualization compares low-wage share to walkability. The relationship is positive in some
+                      parts of the distribution and weak in others, which is precisely the point. If walkability were simply a
+                      matter of wealth, we would expect affluent neighborhoods to dominate the high end of the index and lower
+                      income areas to dominate the low end. Our LA County case study complicates that story. The top walkability
+                      decile has lower average median household income than the bottom decile, even while offering stronger
+                      transit access and a larger share of car-free households. This tells us that compact, transit-rich, and
+                      destination-heavy neighborhoods are not always the most affluent spaces in the county.
+                    </p>
+                    <p>
+                      That finding matches broader scholarship. <a href="https://doi.org/10.1080/01944363.2017.1322527" className="text-sunset hover:underline">Arlie Adkins et al.</a>
+                      argue that relationships between built environment and walking vary by socioeconomic context. A highly
+                      walkable environment does not mean the same thing for every resident. For some, it enables convenience and
+                      flexibility; for others, it may coexist with rent burden, environmental stress, or limited housing choice.
+                      The county’s high-walkability neighborhoods may provide access to transit and daily destinations, but they
+                      are not automatically equitable. The humanities question here is not simply where walkability is high.
+                      It is who benefits from that walkability, who bears its costs, and how those patterns were produced.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">The Historical City Beneath the Data</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      The timeline embedded in the site is not ornamental. It places the county’s contemporary geography inside
+                      a longer history of zoning, segregation, freeway building, and planning ideology. Los Angeles’ earliest
+                      zoning rules and later comprehensive land-use codes separated land uses and stabilized unequal urban
+                      patterns. The freeway era accelerated that process by prioritizing regional automobile mobility over local
+                      neighborhood continuity. As the <a href="https://planning.lacity.gov/plans-policies/community-plan-update/housing-element-rezoning-program-news/historical-housing-and" className="text-sunset hover:underline">Historical Housing and Land Use Study</a>
+                      makes clear, those systems interacted with racially restrictive housing practices and long cycles of
+                      investment and divestment. The result is visible today in where jobs, transit, parks, and amenities were
+                      concentrated.
+                    </p>
+                    <p>
+                      This historical framing matters because it changes the meaning of the walkability index. A block group
+                      with poor access is not merely underperforming against a planning metric. It may reflect decades of
+                      policy decisions that disconnected homes from employment, parks, or reliable transit. Conversely, a highly
+                      walkable block group may owe its score to inherited centrality or past investment rather than to any
+                      recent policy success. By linking the data to historical scholarship, the project resists the temptation
+                      to treat urban problems as if they began with today’s street geometry alone.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">What the Dataset Misses</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      The Smart Location Database is powerful, but its ontology is narrow. It privileges variables that are
+                      nationally standardized, spatially measurable, and easy to aggregate: employment, density, land-use mix,
+                      network structure, and transit proximity. It excludes many elements that residents actually use to judge
+                      whether a place is walkable: sidewalk quality, shade, slope, perceived safety, disability access, traffic
+                      speed, pollution exposure, and the distinction between walking for work, errands, or recreation. It also
+                      omits race and ethnicity in its native form, requiring outside data to study racialized inequality at all.
+                    </p>
+                    <p>
+                      That omission is not trivial. It shapes the kinds of questions the dataset invites and the kinds it
+                      silences. If we only accepted the SLD on its own terms, we would be pushed toward asking how design can be
+                      optimized for smart growth rather than how walkability is structured by power. This is where the project’s
+                      methodological choices are important. Following Catherine D&apos;Ignazio and Lauren Klein, we treat data
+                      work as political work and foreground what the dataset cannot see. Following danah boyd and Kate
+                      Crawford, we avoid treating a large structured dataset as if its scale made it socially complete.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Walkability, Heat, and Health</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      Walkability is often discussed as a mobility or sustainability issue, but the literature makes clear that
+                      it is also a public health issue. <a href="https://doi.org/10.1007/s10389-020-01417-6" className="text-sunset hover:underline">Yonsu Kim et al.</a>
+                      connect Los Angeles built-environment conditions to asthma outcomes, showing that urban design and health
+                      cannot be separated cleanly. Heat scholarship adds another layer. <a href="https://doi.org/10.1088/2515-7620/acabb8" className="text-sunset hover:underline">Ruth Engel and colleagues</a>
+                      show that roads contribute to surface temperature in Southern California, while
+                      <a href="https://doi.org/10.1002/2015JD023718" className="text-sunset hover:underline"> P. Vahmani and G. A. Ban-Weiss</a>
+                      demonstrate how vegetation fraction and urban form shape the urban heat island in Los Angeles. A route may
+                      be technically walkable and still be physiologically punishing.
+                    </p>
+                    <p>
+                      This is one reason the project uses a humanities framing rather than a purely engineering one. The
+                      question is not only whether a neighborhood satisfies a walkability formula. It is whether walking there
+                      is healthy, dignified, and realistically available. In lower-income neighborhoods, the burdens of heat,
+                      air pollution, and unsafe crossings can accumulate alongside the need to walk or rely on transit. The map,
+                      scatterplots, and case study therefore should be read together as evidence of layered exposure, not as
+                      isolated indicators.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Toward a Better Measure</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      Recent research suggests that the future of walkability measurement will need to move beyond proxy
+                      variables alone. <a href="https://doi.org/10.1016/j.tra.2023.103946" className="text-sunset hover:underline">He and He</a>
+                      use mobile phone data and street-view imagery to study mismatches between measured walkability and actual
+                      walking behavior. <a href="https://doi.org/10.1016/j.compenvurbsys.2025.102319" className="text-sunset hover:underline">Donghwan Ki and coauthors</a>
+                      go further by testing multimodal AI methods that can identify nuanced features at street level. And
+                      <a href="https://doi.org/10.1016/j.tra.2025.104498" className="text-sunset hover:underline"> Anna-Lena Van Der Vlugt et al.</a>
+                      argue that perceived walkability may explain walking behavior more effectively than objective scores in
+                      some contexts. Taken together, these studies suggest that the next generation of walkability research will
+                      need to account for experience, not just form.
+                    </p>
+                    <p>
+                      For Los Angeles, that shift would be especially valuable. The county’s neighborhoods vary not only by
+                      geometry but by comfort, stress, danger, and environmental quality. A measure that combines the existing
+                      strength of the SLD with more local indicators of pedestrian experience would produce a more defensible
+                      picture of everyday mobility. It would also better support environmental justice claims by revealing when
+                      highly ranked neighborhoods still impose real burdens on the people who use them.
+                    </p>
+                  </div>
+                </article>
+
+                <article className="bg-white border border-slate-200 rounded p-6 shadow-soft">
+                  <h3 className="font-display text-xl">Conclusion</h3>
+                  <div className="mt-4 space-y-4 text-slate-600">
+                    <p>
+                      The project began with a seemingly straightforward question about where LA County is most and least
+                      walkable. It ends with a broader argument: walkability is a historical, political, and environmental
+                      condition, not just a transportation metric. The map shows that access is uneven. The scatterplots show
+                      that car ownership, transit access, and labor conditions do not line up neatly. The case study shows that
+                      high walkability does not simply track wealth. The timeline shows that those patterns emerge from a long
+                      history of planning decisions rather than from present-day preference alone.
+                    </p>
+                    <p>
+                      That is why this work matters. Walkability affects who can move safely, who reaches parks and schools with
+                      dignity, who absorbs heat and pollution on foot, and who lives close to opportunity without necessarily
+                      sharing in its benefits. By combining the SLD with ACS context, historical scholarship, and critical
+                      reflection on what the data cannot measure, the site argues for a richer understanding of Los Angeles.
+                      The built environment is not just where inequality happens. It is one of the ways inequality is made and
+                      maintained across time.
+                    </p>
+                  </div>
+                </article>
               </div>
             </section>
 
@@ -792,9 +1033,21 @@
                     role: "Web Designer",
                     bio: "First-year computer science major from the Bay Area.",
                   },
-                  { name: "(Enter Name)", role: "(Enter Role)", bio: "(Enter Bio)" },
-                  { name: "(Enter Name)", role: "(Enter Role)", bio: "(Enter Bio)" },
-                  { name: "(Enter Name)", role: "(Enter Role)", bio: "(Enter Bio)" },
+                  {
+                    name: "Rohan Bodla",
+                    role: "Data Specialist",
+                    bio: "Focused on data cleaning strategy, variable selection, and methodological questions around the Smart Location Database.",
+                  },
+                  {
+                    name: "Nicholas Malilay",
+                    role: "Content Developer",
+                    bio: "Led writing and source integration, especially the links between walkability, planning history, and environmental justice.",
+                  },
+                  {
+                    name: "Nicole Brown",
+                    role: "Editor",
+                    bio: "Reviewed written materials for clarity, coherence, and audience accessibility across the final site.",
+                  },
                 ].map((member) => (
                   <div key={member.name} className="bg-white border border-slate-200 rounded p-5 shadow-soft">
                     <div className="text-sm uppercase tracking-[0.2em] text-slate-400">{member.role}</div>
@@ -803,6 +1056,11 @@
                   </div>
                 ))}
               </div>
+              <p className="mt-5 text-sm text-slate-600">
+                Full bios, project responsibilities, and acknowledgments are on the
+                {" "}
+                <a href="about.html" className="text-sunset hover:underline">About page</a>.
+              </p>
             </section>
 
             <section id="resources" className="py-8">
@@ -810,27 +1068,49 @@
                 <h2 className="font-display text-2xl">Resources</h2>
                 <div className="text-xs uppercase tracking-[0.2em] text-slate-400">References and acknowledgments</div>
               </div>
+              <div className="mt-4 bg-white border border-slate-200 rounded p-5 shadow-soft">
+                <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Assignment coverage</div>
+                <p className="mt-3 text-sm text-slate-600">
+                  This site includes the required narrative, timeline, interactive map, at least five non-map
+                  visualizations, a full about page, a standalone data critique, and an annotated bibliography.
+                  A grader-facing checklist is available on the{" "}
+                  <a href="about.html" className="text-sunset hover:underline">About page</a>.
+                </p>
+              </div>
               <div className="mt-6 grid lg:grid-cols-2 gap-6">
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
-                  <h3 className="font-display text-xl">Bibliography</h3>
-                  <ul className="mt-4 space-y-2 text-sm text-slate-600">
-                    <li>EPA Smart Location Database (2019)</li>
-                    <li>U.S. Census ACS 2019 5-year estimates</li>
-                    <li>LEHD LODES employment data (2019)</li>
-                    <li>Spoer, Ben R., et al. “Association between Racial Residential Segregation and Walkability in 745 U.S. Cities.” Health &amp; Place, 2023.</li>
-                    <li>Van Der Vlugt, Anna-Lena, et al. “Analysing the Determinants of Perceived Walkability, and Its Effects on Walking.” Transportation Research Part A, 2025.</li>
-                  </ul>
+                  <h3 className="font-display text-xl">Annotated Bibliography</h3>
+                  <p className="mt-4 text-sm text-slate-600">
+                    The full works cited and annotations are collected on a dedicated bibliography page, including
+                    sources on LA planning history, walkability measurement, environmental justice, heat, and health.
+                  </p>
+                  <a
+                    href="bibliography.html"
+                    className="inline-flex mt-4 px-4 py-2 rounded-md border border-slate-300 text-sm text-slate-700 font-semibold"
+                  >
+                    Open bibliography
+                  </a>
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
-                  <h3 className="font-display text-xl">Acknowledgments</h3>
-                  <p className="mt-3 text-slate-600 font-semibold">Dr. Nicholas Sabo</p>
-                  <p className="mt-2 text-sm text-slate-600">
-                    Thank you for guiding our research framing and for feedback on early drafts and methods.
+                  <h3 className="font-display text-xl">Methods and Critique</h3>
+                  <p className="mt-4 text-sm text-slate-600">
+                    For the project’s technical workflow, source reasoning, and full critique of the Smart Location
+                    Database’s ontology and omissions, see the supporting pages below.
                   </p>
-                  <p className="mt-4 text-slate-600 font-semibold">Teaching Assistant</p>
-                  <p className="mt-2 text-sm text-slate-600">
-                    Thanks for detailed critiques on data cleaning decisions and visualization clarity throughout the term.
-                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <a
+                      href="about.html"
+                      className="px-4 py-2 rounded-md border border-slate-300 text-sm text-slate-700 font-semibold"
+                    >
+                      About page
+                    </a>
+                    <a
+                      href="critique.html"
+                      className="px-4 py-2 rounded-md border border-slate-300 text-sm text-slate-700 font-semibold"
+                    >
+                      Data critique
+                    </a>
+                  </div>
                 </div>
               </div>
             </section>
@@ -839,7 +1119,7 @@
           <footer className="border-t border-slate-200 bg-white/80 backdrop-blur">
             <div className="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
               <span>Walkability in LA County - Project site</span>
-              <span>Built with React, Tailwind CSS, and Leaflet</span>
+              <span>Built with React, Tailwind CSS, Leaflet, and TimelineJS</span>
             </div>
           </footer>
         </div>

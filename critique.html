@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Data Critique | Walkability in LA County</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1f2937",
+            asphalt: "#0f172a",
+            sand: "#fff7ef",
+            haze: "#f8fafc",
+            sunset: "#f97316",
+            ocean: "#0ea5e9",
+          },
+          fontFamily: {
+            display: ["Sora", "system-ui", "sans-serif"],
+            body: ["Manrope", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            soft: "0 12px 28px rgba(15, 23, 42, 0.12)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: "Manrope", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 520px at 85% -10%, rgba(249, 115, 22, 0.18), transparent 55%),
+        radial-gradient(760px 520px at 0% 0%, rgba(14, 165, 233, 0.16), transparent 60%),
+        linear-gradient(180deg, #fff7ef 0%, #ffffff 48%, #f8fafc 100%);
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center gap-4 justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-md bg-asphalt text-white flex items-center justify-center font-display text-lg">LA</div>
+        <div>
+          <div class="font-display text-lg text-ink">Walkability in LA County</div>
+          <div class="text-xs text-slate-500">Built environment, equity, and access</div>
+        </div>
+      </a>
+      <nav class="flex flex-wrap gap-2 text-sm font-medium">
+        <a href="index.html" class="px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:border-asphalt">Narrative</a>
+        <a href="about.html" class="px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:border-asphalt">About</a>
+        <a href="critique.html" class="px-2.5 py-1.5 rounded-md border border-asphalt bg-asphalt text-white">Data Critique</a>
+        <a href="bibliography.html" class="px-2.5 py-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:border-asphalt">Bibliography</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10 space-y-8">
+    <section class="grid lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-8 space-y-5">
+        <div class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+          <span class="w-8 h-0.5 bg-slate-300"></span>
+          Data critique
+        </div>
+        <h1 class="font-display text-3xl md:text-4xl text-ink">What the dataset can show, and what it cannot</h1>
+        <p class="text-lg text-slate-600">
+          Our project uses the EPA Smart Location Database because it provides a strong national walkability
+          measure at the census block-group level. At the same time, its structure privileges some ways of
+          seeing Los Angeles and obscures others. This page explains the dataset’s contents, generation,
+          limits, and ideological effects.
+        </p>
+      </div>
+      <div class="lg:col-span-4">
+        <div class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+          <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Dataset core</div>
+          <ul class="mt-4 space-y-2 text-sm text-slate-600">
+            <li>Unit of analysis: 2019 census block groups.</li>
+            <li>Main index: National Walkability Index.</li>
+            <li>Supplementary fields: households, income, employment, car ownership, transit, density.</li>
+            <li>Joined context: ACS demographic variables used in the LA County analysis.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-2 gap-6">
+      <article class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <h2 class="font-display text-2xl">What is included</h2>
+        <div class="mt-4 space-y-4 text-slate-600">
+          <p>
+            The Smart Location Database contains detailed spatial and socioeconomic information for census block
+            groups across the United States. It includes population and household counts, income-related fields,
+            car ownership, employment by sector, destination accessibility, transit access, and variables tied to
+            the “five Ds” of urban form: density, diversity, design, destination accessibility, and distance to
+            transit. For this project, those variables are useful because they allow us to ask how walkability is
+            distributed across LA County and how it relates to infrastructure, labor geography, and household
+            constraints.
+          </p>
+          <p>
+            In our LA County workflow, the SLD is joined to ACS variables that add race and ethnicity, education,
+            age structure, and housing burden. That supplemental join is important. Without it, the native SLD
+            would remain far more legible as a land-use database than as a social inequality database. The joined
+            version lets us pose humanities questions about privilege, exposure, and uneven access rather than only
+            technical questions about built-form efficiency.
+          </p>
+        </div>
+      </article>
+
+      <article class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <h2 class="font-display text-2xl">How the data was generated</h2>
+        <div class="mt-4 space-y-4 text-slate-600">
+          <p>
+            The SLD is not a single-source dataset. It is an assembled product funded through the EPA’s Smart
+            Growth Program and developed with support from the U.S. General Services Administration. The 2019
+            block-group framework is combined with Census and ACS products, LEHD employment data, TIGER/Line
+            geometries, street-network and land-use data, and transit feeds from multiple agencies and shared GTFS
+            inventories. The walkability index itself is then constructed from a weighted combination of
+            intersection density, proximity to transit, employment mix, and employment-plus-household mix.
+          </p>
+          <p>
+            That origin matters because it reveals the dataset’s intended use. The SLD was created as a planning and
+            smart-growth resource, not as a community ethnography. It is optimized for national consistency,
+            comparability, and planning relevance. Those priorities explain both the dataset’s strengths and its
+            blind spots.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+      <h2 class="font-display text-2xl">What the dataset can illuminate</h2>
+      <div class="mt-4 space-y-4 text-slate-600">
+        <p>
+          The dataset is good at revealing broad structural relationships. It can show where jobs, destinations,
+          and transit cluster. It can compare car-free household share to transit access. It can show whether high
+          walkability tends to coincide with labor concentration, compact urban form, and mixed use. It can also
+          reveal where LA County departs from a simple center-periphery model. For example, some highly walkable
+          neighborhoods are not the highest income neighborhoods, which complicates assumptions that urban access
+          maps directly onto neighborhood wealth.
+        </p>
+        <p>
+          Because the SLD works at block-group scale, it is especially useful for mapping intra-county variation.
+          That scale lets us treat LA County not as a single urban landscape but as a set of unevenly connected
+          mobility environments. It also supports comparison between infrastructure access and household reliance on
+          walking or transit. These are exactly the kinds of spatial relationships a digital humanities project can
+          turn into a narrative about everyday life, governance, and unequal opportunity.
+        </p>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-2 gap-6">
+      <article class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <h2 class="font-display text-2xl">What the dataset cannot reveal</h2>
+        <div class="mt-4 space-y-4 text-slate-600">
+          <p>
+            The dataset does not measure walking behavior itself. There are no pedestrian counts, daily walking
+            frequencies, step counts, or distinctions between walking for errands, work, recreation, or school. A
+            block group can score highly on the walkability index and still contain routes that are unpleasant or
+            unsafe to use. Likewise, a neighborhood can support frequent walking for social or economic reasons even
+            if its environmental proxies are weaker.
+          </p>
+          <p>
+            The SLD also omits many conditions that residents experience immediately: sidewalk quality, curb ramps,
+            traffic speed, shade, hilliness, disability access, lighting, police presence, air pollution, and
+            neighborhood fear. Those absences mean that the SLD can describe the morphology of opportunity more
+            clearly than the lived texture of walking. This is one reason we pair it with scholarship on asthma,
+            urban heat, park access, and perceived walkability.
+          </p>
+        </div>
+      </article>
+
+      <article class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+        <h2 class="font-display text-2xl">What would be left out without outside sources</h2>
+        <div class="mt-4 space-y-4 text-slate-600">
+          <p>
+            Without external demographic joins and historical interpretation, the SLD would leave out many of the
+            inequalities we care about most. We would know where jobs and transit are concentrated, but not how race,
+            ethnicity, education, age, and housing burden shape the ability to benefit from those conditions. We would
+            see infrastructure form more clearly than labor conditions, undocumented or informal work, or exposure to
+            pollution and unsafe streets.
+          </p>
+          <p>
+            We would also lose historical causation. The dataset does not tell us why some areas were disconnected,
+            rezoned, industrialized, or divided by freeways. Those stories come from planning history, environmental
+            justice research, and community-focused scholarship, not from the spreadsheet itself.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+      <h2 class="font-display text-2xl">Ontology and ideological effects</h2>
+      <div class="mt-4 space-y-4 text-slate-600">
+        <p>
+          The dataset’s ontology reflects the values of smart-growth planning. It treats walkability as a problem of
+          measurable urban design: connectivity, proximity, destination access, and efficient movement. That approach
+          is analytically useful, but it also carries an ideological effect. It encourages readers to understand
+          social problems spatially and to imagine that they can be solved through design, transit proximity, and land
+          use optimization alone.
+        </p>
+        <p>
+          In practice, that framing can sideline politics, history, and unequal exposure. A neighborhood may rank well
+          because it is dense, mixed-use, and close to jobs while still being dangerous to walk in, thermally
+          punishing, or burdened by pollution. Metrics like jobs reachable within forty-five minutes emphasize
+          efficiency, productivity, and regional access, but they do not ask whether those jobs are secure, well paid,
+          safe, or accessible to all workers on equal terms.
+        </p>
+        <p>
+          This project therefore treats the SLD as a valuable but incomplete representation. It is strongest when used
+          as one layer in a larger interpretive frame. It becomes misleading when treated as a comprehensive measure of
+          neighborhood life.
+        </p>
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded p-6 shadow-soft">
+      <h2 class="font-display text-2xl">Research questions shaped by the critique</h2>
+      <ul class="mt-4 space-y-2 text-sm text-slate-600">
+        <li>How well do walkability scores reflect and affect economic disparities in Los Angeles?</li>
+        <li>How well served by public transportation are neighborhoods with low rates of car ownership?</li>
+        <li>How do heat, pollution, and asthma complicate what the index calls a walkable place?</li>
+        <li>What does the absence of race in the native SLD make harder to see?</li>
+        <li>To what extent do walkability scores reflect long histories of investment and divestment in Los Angeles?</li>
+        <li>What problems arise when environmental proxies stand in for walking behavior itself?</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
+      <span>Walkability in LA County</span>
+      <span>Data critique page</span>
+    </div>
+  </footer>
+</body>
+</html>
