@@ -103,24 +103,30 @@
     const storySteps = [
       {
         id: "q1",
-        title: "Question 1: Where is walkability highest and lowest?",
+        title: "Question 1: Where are the highest and lowest walkability scores?",
         body:
-          "We start with a regional map of the National Walkability Index by Census block group. A diverging palette shows high scores in darker tones and low scores in lighter tones. Hover reveals the block group name and score.",
-        diagram: "map",
+          "We map NatWalkInd across the LA region to see how walkability clusters across block groups.",
+        image: "images/walkability_map.png",
+        alt: "Walkability index map for the LA region",
+        caption: "Figure 1: National Walkability Index map (LA metro block groups)",
       },
       {
         id: "q2",
-        title: "Question 2: Who is most affected by low walkability?",
+        title: "Question 2: Are car-free households matched by transit access?",
         body:
-          "We compare walkability across neighborhood types and mobility constraints. Early patterns suggest modest differences by age composition, but strong mismatches between car-free rates and transit access.",
-        diagram: "scatter",
+          "We plot car-free household share (Pct_AO0) against transit access (D4A). The trend line highlights the overall relationship across block groups.",
+        image: "images/carfree_vs_transit.svg",
+        alt: "Car-free households vs transit access scatter",
+        caption: "Figure 2: Car-free households vs transit access",
       },
       {
         id: "q3",
-        title: "Question 3: How does history shape these patterns?",
+        title: "Question 3: Does low-wage share explain walkability?",
         body:
-          "We connect present-day walkability to historical planning decisions, land use, and infrastructure investment that structured who benefits from safe, walkable streets.",
-        diagram: "timeline",
+          "We test whether low-wage share (R_PCTLOWWAGE) aligns with walkability scores. This helps separate income effects from built-environment effects.",
+        image: "images/lowwage_vs_walkability.svg",
+        alt: "Low-wage share vs walkability scatter",
+        caption: "Figure 3: Low-wage share vs walkability",
       },
     ];
 
@@ -162,92 +168,6 @@
     ];
 
 
-    const MapDiagram = () => (
-      <svg viewBox="0 0 400 220" className="w-full h-full" aria-label="Walkability map diagram">
-        <defs>
-          <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#cbd5e1" strokeWidth="1" />
-          </pattern>
-        </defs>
-        <rect x="0" y="0" width="400" height="220" fill="url(#grid)" />
-        <rect x="20" y="20" width="360" height="180" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
-        <circle cx="110" cy="90" r="16" fill="#22c55e" opacity="0.85" />
-        <circle cx="180" cy="140" r="12" fill="#4ade80" opacity="0.8" />
-        <circle cx="260" cy="80" r="14" fill="#facc15" opacity="0.9" />
-        <circle cx="300" cy="130" r="18" fill="#ef4444" opacity="0.85" />
-        <rect x="40" y="170" width="320" height="10" fill="#111827" opacity="0.75" />
-      </svg>
-    );
-
-    const ScatterDiagram = () => (
-      <svg viewBox="0 0 400 220" className="w-full h-full" aria-label="Scatter diagram">
-        <rect x="0" y="0" width="400" height="220" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
-        <line x1="50" y1="20" x2="50" y2="180" stroke="#0f172a" strokeWidth="2" />
-        <line x1="50" y1="180" x2="360" y2="180" stroke="#0f172a" strokeWidth="2" />
-        <line x1="70" y1="60" x2="330" y2="160" stroke="#94a3b8" strokeWidth="2" strokeDasharray="6 6" />
-        <g fill="#38bdf8" opacity="0.8">
-          <circle cx="90" cy="120" r="5" />
-          <circle cx="120" cy="130" r="5" />
-          <circle cx="150" cy="110" r="5" />
-          <circle cx="180" cy="140" r="5" />
-          <circle cx="210" cy="120" r="5" />
-          <circle cx="240" cy="150" r="5" />
-          <circle cx="270" cy="140" r="5" />
-          <circle cx="300" cy="160" r="5" />
-        </g>
-        <text x="50" y="205" fontSize="10" fill="#64748b">Car-free share</text>
-        <text x="10" y="20" fontSize="10" fill="#64748b" transform="rotate(-90 12,20)">Transit access</text>
-      </svg>
-    );
-
-    const TimelineDiagram = () => (
-      <svg viewBox="0 0 400 220" className="w-full h-full" aria-label="Timeline diagram">
-        <rect x="0" y="0" width="400" height="220" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
-        <line x1="40" y1="110" x2="360" y2="110" stroke="#111827" strokeWidth="3" />
-        <circle cx="80" cy="110" r="10" fill="#22c55e" />
-        <circle cx="180" cy="110" r="10" fill="#facc15" />
-        <circle cx="280" cy="110" r="10" fill="#ef4444" />
-        <text x="60" y="80" fontSize="11" fill="#475569">Early growth</text>
-        <text x="150" y="150" fontSize="11" fill="#475569">Freeway era</text>
-        <text x="255" y="80" fontSize="11" fill="#475569">Today</text>
-      </svg>
-    );
-
-    const PipelineDiagram = () => (
-      <svg viewBox="0 0 520 200" className="w-full h-full" aria-label="Data processing pipeline">
-        <rect x="0" y="0" width="520" height="200" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
-        <rect x="20" y="60" width="110" height="60" fill="#e0f2fe" stroke="#38bdf8" strokeWidth="2" />
-        <rect x="160" y="60" width="110" height="60" fill="#ecfdf5" stroke="#22c55e" strokeWidth="2" />
-        <rect x="300" y="60" width="110" height="60" fill="#fef9c3" stroke="#facc15" strokeWidth="2" />
-        <rect x="440" y="60" width="60" height="60" fill="#fee2e2" stroke="#ef4444" strokeWidth="2" />
-        <text x="35" y="95" fontSize="11" fill="#0f172a">Sources</text>
-        <text x="175" y="95" fontSize="11" fill="#0f172a">Cleaning</text>
-        <text x="320" y="95" fontSize="11" fill="#0f172a">Filtering</text>
-        <text x="448" y="95" fontSize="11" fill="#0f172a">Viz</text>
-        <line x1="130" y1="90" x2="160" y2="90" stroke="#64748b" strokeWidth="2" markerEnd="url(#arrow)" />
-        <line x1="270" y1="90" x2="300" y2="90" stroke="#64748b" strokeWidth="2" markerEnd="url(#arrow)" />
-        <line x1="410" y1="90" x2="440" y2="90" stroke="#64748b" strokeWidth="2" markerEnd="url(#arrow)" />
-        <defs>
-          <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#64748b" />
-          </marker>
-        </defs>
-      </svg>
-    );
-
-    const SourceStackDiagram = () => (
-      <svg viewBox="0 0 420 220" className="w-full h-full" aria-label="Source stack diagram">
-        <rect x="0" y="0" width="420" height="220" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
-        <rect x="60" y="140" width="300" height="30" fill="#e0f2fe" stroke="#38bdf8" strokeWidth="2" />
-        <rect x="70" y="110" width="280" height="30" fill="#ecfdf5" stroke="#22c55e" strokeWidth="2" />
-        <rect x="80" y="80" width="260" height="30" fill="#fef9c3" stroke="#facc15" strokeWidth="2" />
-        <rect x="90" y="50" width="240" height="30" fill="#fee2e2" stroke="#ef4444" strokeWidth="2" />
-        <text x="110" y="160" fontSize="11" fill="#0f172a">Census / ACS</text>
-        <text x="120" y="130" fontSize="11" fill="#0f172a">SLD inputs</text>
-        <text x="130" y="100" fontSize="11" fill="#0f172a">Transit access</text>
-        <text x="150" y="70" fontSize="11" fill="#0f172a">Walkability index</text>
-      </svg>
-    );
     function useScrollProgress() {
       const [progress, setProgress] = useState(0);
       useEffect(() => {
@@ -337,8 +257,8 @@
                     Walkability is not evenly distributed. This project maps who benefits, and why.
                   </h1>
                   <p className="text-slate-600 text-lg">
-                    We analyze the EPA Smart Location Database with LA County context to understand how
-                    infrastructure, history, and policy shape access to safe, walkable streets.
+                    We analyze the EPA Smart Location Database with Greater Los Angeles regional context to
+                    understand how infrastructure, history, and policy shape access to safe, walkable streets.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <a
@@ -355,9 +275,27 @@
                     </a>
                   </div>
                   <div className="flex flex-wrap gap-3 text-sm text-slate-600">
-                    <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">LA County focus</span>
+                    <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">LA metro focus</span>
                     <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">Census block groups</span>
                     <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200">Equity lens</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                    <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Block groups</div>
+                      <div className="font-display text-lg">10,800</div>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Mean walkability</div>
+                      <div className="font-display text-lg">12.9</div>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Car-free share</div>
+                      <div className="font-display text-lg">6.8%</div>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded p-3 shadow-soft">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Transit access</div>
+                      <div className="font-display text-lg">373.9</div>
+                    </div>
                   </div>
                 </div>
                 <div className="lg:col-span-5">
@@ -408,11 +346,26 @@
                   </div>
                 ))}
               </div>
-              <div className="mt-6 h-44 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
-                <SourceStackDiagram />
+              <div className="mt-6 grid md:grid-cols-2 gap-4">
+                <div className="h-44 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
+                  <img
+                    src="images/walkability_hist.svg"
+                    alt="Distribution of National Walkability Index"
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="h-44 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
+                  <img
+                    src="images/walkability_by_cbsa_boxplot.svg"
+                    alt="Walkability by CBSA boxplot"
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-              <div className="mt-5 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-white">
-                TO DO: Add additional data sources we used.
+              <div className="mt-2 text-xs text-slate-500">
+                Figure A: Distribution of National Walkability Index. Figure B: Walkability by CBSA (boxplot).
               </div>
             </section>
 
@@ -446,15 +399,11 @@
                       <h3 className="font-display text-xl">{step.title}</h3>
                       <p className="mt-3 text-slate-600">{step.body}</p>
                       <div className="mt-5 h-48 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
-                        {step.diagram === "map" && <MapDiagram />}
-                        {step.diagram === "scatter" && <ScatterDiagram />}
-                        {step.diagram === "timeline" && <TimelineDiagram />}
+                        <img src={step.image} alt={step.alt} className="w-full h-full object-contain" loading="lazy" />
                       </div>
+                      <div className="mt-2 text-xs text-slate-500">{step.caption}</div>
                     </article>
                   ))}
-                  <div className="border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-white">
-                    TO DO: Add figures, captions, and links to the interactive visuals.
-                  </div>
                 </div>
               </div>
             </section>
@@ -466,23 +415,35 @@
               </div>
               <div className="mt-6 grid lg:grid-cols-2 gap-6">
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
-                  <h3 className="font-display text-xl">Neighborhood A</h3>
-                  <p className="mt-3 text-slate-600">TO DO: Summarize the walkability profile, demographics, and transit access.</p>
-                  <div className="mt-4 h-40 rounded-md bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-500">
-                    Add map or chart
-                  </div>
+                  <h3 className="font-display text-xl">High Walkability (Top 10%)</h3>
+                  <p className="mt-3 text-slate-600">
+                    1,157 block groups average a walkability score of 17.8 with a 10.7% car-free household share.
+                    Transit access (D4A) averages 269, while median household income averages about $68.9k.
+                  </p>
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
-                  <h3 className="font-display text-xl">Neighborhood B</h3>
-                  <p className="mt-3 text-slate-600">TO DO: Summarize the contrasting walkability profile and historical context.</p>
-                  <div className="mt-4 h-40 rounded-md bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-500">
-                    Add map or chart
-                  </div>
+                  <h3 className="font-display text-xl">Low Walkability (Bottom 10%)</h3>
+                  <p className="mt-3 text-slate-600">
+                    1,139 block groups average a walkability score of 5.9 with a 3.1% car-free household share.
+                    Transit access (D4A) averages 4.7, and median household income averages about $97.5k.
+                  </p>
                 </div>
               </div>
-              <div className="mt-5 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-white">
-                TO DO: Explain why these two neighborhoods were selected.
+              <div className="mt-6 h-64 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
+                <img
+                  src="images/case_study_comparison.svg"
+                  alt="Top vs bottom walkability decile comparison"
+                  className="w-full h-full object-contain"
+                  loading="lazy"
+                />
               </div>
+              <div className="mt-2 text-xs text-slate-500">
+                Figure 4: Top vs bottom walkability deciles across key variables
+              </div>
+              <p className="mt-4 text-sm text-slate-600">
+                We selected the top and bottom deciles to maximize contrast while keeping enough block groups in each
+                group for stable averages.
+              </p>
             </section>
 
             <section id="methods" className="py-8">
@@ -494,30 +455,46 @@
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
                   <h3 className="font-display text-xl">Why These Sources?</h3>
                   <p className="mt-3 text-slate-600">We selected sources that are transparent, replicable, and compatible with Census geographies.</p>
-                  <div className="mt-4 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                    TO DO: Explain reasoning for cited sources.
-                  </div>
+                  <p className="mt-4 text-sm text-slate-600">
+                    The Smart Location Database provides block-group scale built-environment measures, while ACS and LEHD
+                    add socioeconomic and job-density context. Transit access variables (D4A) are derived from GTFS inputs,
+                    allowing a consistent GEOID-based join across sources.
+                  </p>
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
                   <h3 className="font-display text-xl">Silences and Limitations</h3>
                   <p className="mt-3 text-slate-600">Every dataset makes tradeoffs. We document what is missing and how it affects interpretation.</p>
-                  <div className="mt-4 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                    TO DO: Talk about limitations we noticed.
-                  </div>
+                  <p className="mt-4 text-sm text-slate-600">
+                    The walkability index captures proximity and built form, not sidewalk quality, safety, or perceived
+                    comfort. It is a 2019 snapshot and may miss recent infrastructure changes. Block-group averages can hide
+                    within-neighborhood variation, and modeled transit access does not reflect reliability or rider
+                    experience.
+                  </p>
                 </div>
               </div>
               <div className="mt-6 bg-white border border-slate-200 rounded p-6 shadow-soft">
                 <h3 className="font-display text-xl">Processing Our Data</h3>
-                <p className="mt-3 text-slate-600">We cleaned, filtered, and aligned multiple sources to focus on LA County block groups.</p>
-                <div className="mt-4 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                  TO DO: Describe how data was cleaned and prepared. Answer these questions:
-                  - What tools were used?
-                  - How clean the data was from the start and what issues had to be fixed?
-                  - How was data filtered to just LA County?
-                </div>
+                <p className="mt-3 text-slate-600">We cleaned, filtered, and aligned multiple sources to focus on LA metro block groups.</p>
+                <p className="mt-4 text-sm text-slate-600">
+                  We used Python (pandas, geopandas) to load the cleaned CSV, exclude rows missing key fields per chart,
+                  compute deciles and correlations, and join block-group geometries for mapping. The provided dataset already
+                  targets the Los Angeles metro counties (Los Angeles, Orange, Riverside, San Bernardino, Ventura), so we
+                  kept that footprint for all summaries and visualizations.
+                </p>
               </div>
-              <div className="mt-5 h-48 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
-                <PipelineDiagram />
+              <p className="mt-5 text-sm text-slate-600">
+                We summarize relationships between walkability, transit access, car-free share, low-wage share, and population with a correlation heatmap.
+              </p>
+              <div className="mt-3 h-48 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center p-3">
+                <img
+                  src="images/correlation_heatmap.svg"
+                  alt="Correlation heatmap of walkability and related variables"
+                  className="w-full h-full object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <div className="mt-2 text-xs text-slate-500">
+                Figure 5: Correlation heatmap for walkability, transit access, car-free share, low-wage share, and population
               </div>
               <div className="mt-6 grid lg:grid-cols-3 gap-4">
                 {toolList.map((tool) => (
@@ -527,17 +504,17 @@
                   </div>
                 ))}
               </div>
-              <div className="mt-5 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-white">
-                TO DO: List the tools you used to create visualizations and why.
-              </div>
               <div className="mt-6 bg-white border border-slate-200 rounded p-6 shadow-soft">
                 <h3 className="font-display text-xl">Why We Processed It This Way</h3>
                 <p className="mt-3 text-slate-600">
                   We chose processing steps that foreground equity questions and avoid erasing neighborhood-level variation.
                 </p>
-                <div className="mt-4 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                  TO DO: Cite class readings to justify your processing decisions. Add 1-2 more citations.
-                </div>
+                <p className="mt-4 text-sm text-slate-600">
+                  Following D&apos;Ignazio and Klein&apos;s emphasis on power in data work, we prioritize variables tied to access
+                  and inequality rather than collapsing to a single citywide average. We also align with boyd and Crawford&apos;s
+                  call to surface data limitations by documenting missing transit service and model-based measures alongside
+                  our findings.
+                </p>
               </div>
             </section>
 
@@ -584,20 +561,24 @@
               <div className="mt-6 grid lg:grid-cols-2 gap-6">
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
                   <h3 className="font-display text-xl">Bibliography</h3>
-                  <div className="mt-4 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                    TO DO: Add citations and links to sources.
-                  </div>
+                  <ul className="mt-4 space-y-2 text-sm text-slate-600">
+                    <li>EPA Smart Location Database (2019)</li>
+                    <li>U.S. Census ACS 2019 5-year estimates</li>
+                    <li>LEHD LODES employment data (2019)</li>
+                    <li>Spoer, Ben R., et al. “Association between Racial Residential Segregation and Walkability in 745 U.S. Cities.” Health &amp; Place, 2023.</li>
+                    <li>Van Der Vlugt, Anna-Lena, et al. “Analysing the Determinants of Perceived Walkability, and Its Effects on Walking.” Transportation Research Part A, 2025.</li>
+                  </ul>
                 </div>
                 <div className="bg-white border border-slate-200 rounded p-6 shadow-soft">
                   <h3 className="font-display text-xl">Acknowledgments</h3>
                   <p className="mt-3 text-slate-600 font-semibold">Dr. Nicholas Sabo</p>
-                  <div className="mt-2 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                    TO DO: Write 1-2 sentences thanking professor.
-                  </div>
-                  <p className="mt-4 text-slate-600 font-semibold">TA</p>
-                  <div className="mt-2 border border-dashed border-slate-300 rounded-md p-4 text-sm text-slate-500 bg-slate-50">
-                    TO DO: Thank TA.
-                  </div>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Thank you for guiding our research framing and for feedback on early drafts and methods.
+                  </p>
+                  <p className="mt-4 text-slate-600 font-semibold">Teaching Assistant</p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Thanks for detailed critiques on data cleaning decisions and visualization clarity throughout the term.
+                  </p>
                 </div>
               </div>
             </section>
