@@ -1,6 +1,7 @@
 (function () {
-  const STORAGE_PREFIX = "walkability-inline-editor:v1:";
+  const STORAGE_PREFIX = "walkability-inline-editor:v2:";
   const ENABLE_KEY = "walkability-inline-editor:enabled";
+  const DEFAULT_DEBOUNCE_MS = 400;
   const SELECTOR = [
     "main h1",
     "main h2",
@@ -17,43 +18,81 @@
   const state = {
     enabled: localStorage.getItem(ENABLE_KEY) !== "0",
     blocks: {},
+    mode: "local",
+    clientId:
+      window.crypto && typeof window.crypto.randomUUID === "function"
+        ? window.crypto.randomUUID()
+        : `client-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    saveDebounceMs: DEFAULT_DEBOUNCE_MS,
+    remoteReady: false,
+    remoteError: null,
+    focusedId: null,
+    saveVersion: 0,
+    lastAppliedRemoteAt: 0,
+    supabase: null,
+    channel: null,
+    config: null,
   };
 
   let toolbar = null;
   let statusNode = null;
+  let pillNode = null;
+  let blurbNode = null;
   let mutationObserver = null;
   let saveTimer = null;
 
-  function pageKey() {
-    return `${STORAGE_PREFIX}${window.location.pathname || "/"}`;
+  function pagePath() {
+    return window.location.pathname || "/";
   }
 
-  function loadBlocks() {
+  function pageKey() {
+    return `${STORAGE_PREFIX}${pagePath()}`;
+  }
+
+  function getConfig() {
+    const cfg = window.__INLINE_EDITOR_SUPABASE__ || {};
+    return {
+      enabled: Boolean(cfg.enabled),
+      url: String(cfg.url || "").trim(),
+      anonKey: String(cfg.anonKey || "").trim(),
+      schema: String(cfg.schema || "public").trim(),
+      table: String(cfg.table || "site_content_blocks").trim(),
+      realtime: cfg.realtime !== false,
+      saveDebounceMs:
+        Number.isFinite(Number(cfg.saveDebounceMs)) && Number(cfg.saveDebounceMs) > 0
+          ? Number(cfg.saveDebounceMs)
+          : DEFAULT_DEBOUNCE_MS,
+    };
+  }
+
+  function loadLocalPayload() {
     try {
       const raw = localStorage.getItem(pageKey());
-      if (!raw) return {};
+      if (!raw) return { blocks: {} };
       const payload = JSON.parse(raw);
-      return payload && typeof payload === "object" && payload.blocks ? payload.blocks : {};
+      if (!payload || typeof payload !== "object") return { blocks: {} };
+      return {
+        blocks: payload.blocks && typeof payload.blocks === "object" ? payload.blocks : {},
+        updatedAt: payload.updatedAt || null,
+      };
     } catch (error) {
       console.warn("inline editor: failed to load local state", error);
-      return {};
+      return { blocks: {} };
     }
   }
 
-  function saveBlocks() {
+  function persistLocal(blocks) {
     const payload = {
-      path: window.location.pathname || "/",
+      path: pagePath(),
       updatedAt: new Date().toISOString(),
-      blocks: collectBlocks(),
+      blocks,
     };
     localStorage.setItem(pageKey(), JSON.stringify(payload));
-    state.blocks = payload.blocks;
-    setStatus("Saved locally");
+    state.blocks = blocks;
   }
 
-  function scheduleSave() {
-    window.clearTimeout(saveTimer);
-    saveTimer = window.setTimeout(saveBlocks, 120);
+  function escapeFilterValue(value) {
+    return String(value).replaceAll(",", "\\,");
   }
 
   function collectBlocks() {
@@ -102,12 +141,34 @@
     }
   }
 
+  function applyBlocksToDom(blocks, options) {
+    const opts = options || {};
+    Object.entries(blocks || {}).forEach(([id, html]) => {
+      const element = document.querySelector(`[data-edit-id="${CSS.escape(id)}"]`);
+      if (!element) return;
+      const skipWhileFocused = opts.skipFocused !== false;
+      if (skipWhileFocused && state.focusedId && state.focusedId === id) return;
+      if (element.innerHTML !== html) {
+        element.innerHTML = html;
+      }
+    });
+  }
+
   function bindElement(element) {
     if (element.dataset.inlineEditorBound === "1") return;
     element.dataset.inlineEditorBound = "1";
-    element.addEventListener("input", scheduleSave);
-    element.addEventListener("blur", saveBlocks);
-    element.addEventListener("focus", () => setStatus("Editing locally"));
+    element.addEventListener("input", () => {
+      setStatus(state.mode === "supabase" ? "Saving to Supabase..." : "Saving locally...");
+      scheduleSave();
+    });
+    element.addEventListener("focus", () => {
+      state.focusedId = element.dataset.editId || null;
+      setStatus(state.mode === "supabase" ? "Editing live" : "Editing locally");
+    });
+    element.addEventListener("blur", () => {
+      state.focusedId = null;
+      queueSave(true);
+    });
   }
 
   function hydratePage() {
@@ -129,9 +190,21 @@
     if (statusNode) statusNode.textContent = message;
   }
 
+  function updateToolbarMode() {
+    if (pillNode) {
+      pillNode.textContent = state.mode === "supabase" ? "Shared live" : "Local fallback";
+    }
+    if (blurbNode) {
+      blurbNode.textContent =
+        state.mode === "supabase"
+          ? "Click body text to edit. Changes save to Supabase and sync across visitors on this page."
+          : "Click body text to edit. Changes save in this browser. Enable Supabase in scripts/supabase_config.js for shared live editing.";
+    }
+  }
+
   async function copyJson() {
     const payload = {
-      path: window.location.pathname || "/",
+      path: pagePath(),
       updatedAt: new Date().toISOString(),
       blocks: collectBlocks(),
     };
@@ -144,6 +217,59 @@
       window.prompt("Copy your edits JSON", json);
       setStatus("Used prompt fallback");
     }
+  }
+
+  async function upsertRemoteBlocks(blocks) {
+    if (!state.supabase || !state.config) return;
+    const rows = Object.entries(blocks).map(([blockId, html]) => ({
+      path: pagePath(),
+      block_id: blockId,
+      html,
+      client_id: state.clientId,
+      updated_at: new Date().toISOString(),
+    }));
+    if (!rows.length) return;
+    const { error } = await state.supabase
+      .from(state.config.table)
+      .upsert(rows, { onConflict: "path,block_id" });
+    if (error) throw error;
+  }
+
+  async function flushSave() {
+    window.clearTimeout(saveTimer);
+    saveTimer = null;
+    const version = ++state.saveVersion;
+    const blocks = collectBlocks();
+    persistLocal(blocks);
+    if (state.mode !== "supabase" || !state.remoteReady) {
+      setStatus("Saved locally");
+      return;
+    }
+    try {
+      await upsertRemoteBlocks(blocks);
+      if (version === state.saveVersion) {
+        setStatus("Saved to Supabase");
+      }
+    } catch (error) {
+      console.error("inline editor: Supabase save failed", error);
+      state.remoteError = error;
+      setStatus("Supabase save failed; local copy kept");
+    }
+  }
+
+  function scheduleSave() {
+    queueSave(false);
+  }
+
+  function queueSave(immediate) {
+    window.clearTimeout(saveTimer);
+    if (immediate) {
+      void flushSave();
+      return;
+    }
+    saveTimer = window.setTimeout(() => {
+      void flushSave();
+    }, state.saveDebounceMs);
   }
 
   async function importJson() {
@@ -160,17 +286,15 @@
       const parsed = JSON.parse(raw);
       const blocks = parsed && typeof parsed === "object" && parsed.blocks ? parsed.blocks : parsed;
       if (!blocks || typeof blocks !== "object") throw new Error("Missing blocks");
-      state.blocks = blocks;
-      localStorage.setItem(
-        pageKey(),
-        JSON.stringify({
-          path: window.location.pathname || "/",
-          updatedAt: new Date().toISOString(),
-          blocks,
-        })
-      );
+      persistLocal(blocks);
+      applyBlocksToDom(blocks, { skipFocused: false });
       hydratePage();
-      setStatus("Imported JSON");
+      if (state.mode === "supabase" && state.remoteReady) {
+        await upsertRemoteBlocks(blocks);
+        setStatus("Imported JSON and pushed live");
+      } else {
+        setStatus("Imported JSON locally");
+      }
     } catch (error) {
       console.error("inline editor: import failed", error);
       window.alert("Could not parse pasted JSON.");
@@ -179,7 +303,11 @@
   }
 
   function resetPage() {
-    const confirmed = window.confirm("Reset all local edits on this page?");
+    const message =
+      state.mode === "supabase"
+        ? "Reset this page to its original repo text in this browser? This does not delete Supabase content already saved."
+        : "Reset all local edits on this page?";
+    const confirmed = window.confirm(message);
     if (!confirmed) return;
     localStorage.removeItem(pageKey());
     window.location.reload();
@@ -220,7 +348,7 @@
         right: 16px;
         bottom: 16px;
         z-index: 2147483647;
-        width: min(360px, calc(100vw - 32px));
+        width: min(380px, calc(100vw - 32px));
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         background: rgba(255, 255, 255, 0.96);
@@ -292,8 +420,8 @@
     toolbar.dataset.inlineEditorToolbar = "1";
     toolbar.innerHTML = `
       <h2>Inline Text Editing</h2>
-      <div class="pill">Local only</div>
-      <p>Click body text to edit. Changes save in this browser. Use JSON copy/import to share edits with teammates.</p>
+      <div class="pill" id="inline-editor-pill">Local fallback</div>
+      <p id="inline-editor-blurb">Click body text to edit. Changes save in this browser. Enable Supabase in scripts/supabase_config.js for shared live editing.</p>
       <div class="status" id="inline-editor-status">Ready</div>
       <div class="actions">
         <button id="inline-editor-toggle" type="button">${state.enabled ? "Disable editing" : "Enable editing"}</button>
@@ -304,16 +432,20 @@
     `;
     document.body.appendChild(toolbar);
     statusNode = toolbar.querySelector("#inline-editor-status");
+    pillNode = toolbar.querySelector("#inline-editor-pill");
+    blurbNode = toolbar.querySelector("#inline-editor-blurb");
     toolbar.querySelector("#inline-editor-toggle").addEventListener("click", toggleEditing);
     toolbar.querySelector("#inline-editor-copy").addEventListener("click", copyJson);
     toolbar.querySelector("#inline-editor-import").addEventListener("click", importJson);
     toolbar.querySelector("#inline-editor-reset").addEventListener("click", resetPage);
+    updateToolbarMode();
   }
 
   function startObserver() {
     if (mutationObserver) mutationObserver.disconnect();
     mutationObserver = new MutationObserver(() => {
       hydratePage();
+      applyBlocksToDom(state.blocks, { skipFocused: true });
     });
     mutationObserver.observe(document.body, {
       childList: true,
@@ -321,15 +453,106 @@
     });
   }
 
+  async function connectSupabase() {
+    state.config = getConfig();
+    state.saveDebounceMs = state.config.saveDebounceMs;
+    if (!state.config.enabled || !state.config.url || !state.config.anonKey) {
+      state.mode = "local";
+      updateToolbarMode();
+      setStatus("Supabase not configured; local editing only");
+      return;
+    }
+
+    try {
+      const moduleUrl = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+      const { createClient } = await import(moduleUrl);
+      state.supabase = createClient(state.config.url, state.config.anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+
+      const { data, error } = await state.supabase
+        .from(state.config.table)
+        .select("block_id, html, updated_at, client_id")
+        .eq("path", pagePath());
+
+      if (error) throw error;
+
+      const remoteBlocks = {};
+      (data || []).forEach((row) => {
+        remoteBlocks[row.block_id] = row.html;
+      });
+
+      if (Object.keys(remoteBlocks).length) {
+        state.blocks = remoteBlocks;
+        persistLocal(remoteBlocks);
+        applyBlocksToDom(remoteBlocks, { skipFocused: false });
+        hydratePage();
+      }
+
+      state.mode = "supabase";
+      state.remoteReady = true;
+      state.remoteError = null;
+      updateToolbarMode();
+      setStatus("Connected to Supabase live editing");
+
+      if (state.config.realtime) {
+        const filter = `path=eq.${escapeFilterValue(pagePath())}`;
+        state.channel = state.supabase
+          .channel(`inline-editor:${pagePath()}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: state.config.schema,
+              table: state.config.table,
+              filter,
+            },
+            (payload) => {
+              const row = payload && payload.new ? payload.new : null;
+              if (!row || !row.block_id) return;
+              if (row.client_id && row.client_id === state.clientId) return;
+              state.lastAppliedRemoteAt = Date.now();
+              state.blocks[row.block_id] = row.html;
+              persistLocal(state.blocks);
+              applyBlocksToDom({ [row.block_id]: row.html }, { skipFocused: true });
+              setStatus("Remote edit received");
+            }
+          )
+          .subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              setStatus("Supabase realtime connected");
+            }
+          });
+      }
+    } catch (error) {
+      console.error("inline editor: Supabase init failed", error);
+      state.mode = "local";
+      state.remoteReady = false;
+      state.remoteError = error;
+      updateToolbarMode();
+      setStatus("Supabase unavailable; local editing only");
+    }
+  }
+
   function init() {
-    state.blocks = loadBlocks();
+    const local = loadLocalPayload();
+    state.blocks = local.blocks;
+    state.config = getConfig();
+    state.saveDebounceMs = state.config.saveDebounceMs;
     injectStyles();
     createToolbar();
     hydratePage();
     startObserver();
-    window.setTimeout(hydratePage, 400);
-    window.setTimeout(hydratePage, 1200);
+    window.setTimeout(() => {
+      hydratePage();
+      applyBlocksToDom(state.blocks, { skipFocused: false });
+    }, 400);
+    window.setTimeout(() => {
+      hydratePage();
+      applyBlocksToDom(state.blocks, { skipFocused: false });
+    }, 1200);
     setStatus(state.enabled ? "Editing enabled" : "Editing disabled");
+    void connectSupabase();
   }
 
   if (document.readyState === "loading") {
