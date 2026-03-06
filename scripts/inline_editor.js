@@ -1,7 +1,8 @@
 (function () {
-  const STORAGE_PREFIX = "walkability-inline-editor:v2:";
+  const STORAGE_PREFIX = "walkability-inline-editor:v3:";
   const ENABLE_KEY = "walkability-inline-editor:enabled";
   const DEFAULT_DEBOUNCE_MS = 400;
+  const POLL_MS = 1500;
   const SELECTOR = [
     "main h1",
     "main h2",
@@ -28,7 +29,6 @@
     remoteError: null,
     focusedId: null,
     saveVersion: 0,
-    lastAppliedRemoteAt: 0,
     lastRemoteSignature: "",
     pollTimer: null,
     config: null,
@@ -55,7 +55,6 @@
       enabled: Boolean(cfg.enabled),
       url: String(cfg.url || "").trim(),
       anonKey: String(cfg.anonKey || "").trim(),
-      schema: String(cfg.schema || "public").trim(),
       table: String(cfg.table || "site_content_blocks").trim(),
       realtime: cfg.realtime !== false,
       saveDebounceMs:
@@ -89,10 +88,6 @@
     };
     localStorage.setItem(pageKey(), JSON.stringify(payload));
     state.blocks = blocks;
-  }
-
-  function escapeFilterValue(value) {
-    return String(value).replaceAll(",", "\\,");
   }
 
   function restTableUrl() {
@@ -155,24 +150,11 @@
     }
   }
 
-  function applyBlocksToDom(blocks, options) {
-    const opts = options || {};
-    Object.entries(blocks || {}).forEach(([id, html]) => {
-      const element = document.querySelector(`[data-edit-id="${CSS.escape(id)}"]`);
-      if (!element) return;
-      const skipWhileFocused = opts.skipFocused !== false;
-      if (skipWhileFocused && state.focusedId && state.focusedId === id) return;
-      if (element.innerHTML !== html) {
-        element.innerHTML = html;
-      }
-    });
-  }
-
   function bindElement(element) {
     if (element.dataset.inlineEditorBound === "1") return;
     element.dataset.inlineEditorBound = "1";
     element.addEventListener("input", () => {
-      setStatus(state.mode === "supabase" ? "Saving to Supabase..." : "Saving locally...");
+      setStatus(state.mode === "supabase" ? "Saving live..." : "Saving locally...");
       scheduleSave();
     });
     element.addEventListener("focus", () => {
@@ -182,6 +164,18 @@
     element.addEventListener("blur", () => {
       state.focusedId = null;
       queueSave(true);
+    });
+  }
+
+  function applyBlocksToDom(blocks, options) {
+    const opts = options || {};
+    Object.entries(blocks || {}).forEach(([id, html]) => {
+      const element = document.querySelector(`[data-edit-id="${CSS.escape(id)}"]`);
+      if (!element) return;
+      if (opts.skipFocused !== false && state.focusedId && state.focusedId === id) return;
+      if (element.innerHTML !== html) {
+        element.innerHTML = html;
+      }
     });
   }
 
@@ -368,7 +362,7 @@
   function resetPage() {
     const message =
       state.mode === "supabase"
-        ? "Reset this page to its original repo text in this browser? This does not delete Supabase content already saved."
+        ? "Reset this page to the original repo text in this browser? This does not delete content already saved in Supabase."
         : "Reset all local edits on this page?";
     const confirmed = window.confirm(message);
     if (!confirmed) return;
@@ -529,7 +523,7 @@
     try {
       const rows = await fetchRemoteRows();
       state.lastRemoteSignature = rowsSignature(rows);
-      applyRemoteRows(rows, { skipFocused: false, allowEmpty: false });
+      applyRemoteRows(rows, { skipFocused: false, allowEmpty: true });
 
       state.mode = "supabase";
       state.remoteReady = true;
@@ -545,14 +539,13 @@
             const signature = rowsSignature(latestRows);
             if (signature !== state.lastRemoteSignature) {
               state.lastRemoteSignature = signature;
-              state.lastAppliedRemoteAt = Date.now();
               applyRemoteRows(latestRows, { skipFocused: true, allowEmpty: true });
               setStatus("Remote edit received");
             }
           } catch (error) {
             console.error("inline editor: Supabase poll failed", error);
           }
-        }, 1500);
+        }, POLL_MS);
       }
     } catch (error) {
       console.error("inline editor: Supabase init failed", error);
