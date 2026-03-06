@@ -10,6 +10,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module" src="https://js.arcgis.com/5.0/embeddable-components/"></script>
   <script>
+    window.__SITE_INLINE_EDIT__ = true;
+  </script>
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -207,6 +210,7 @@
     function useScrollProgress() {
       const [progress, setProgress] = useState(0);
       useEffect(() => {
+        if (window.__SITE_INLINE_EDIT__) return undefined;
         const onScroll = () => {
           const doc = document.documentElement;
           const total = doc.scrollHeight - doc.clientHeight;
@@ -223,6 +227,7 @@
     function useActiveSection(sectionIds) {
       const [active, setActive] = useState(sectionIds[0]);
       useEffect(() => {
+        if (window.__SITE_INLINE_EDIT__) return undefined;
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
@@ -966,5 +971,6 @@
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(<App />);
   </script>
+  <script src="scripts/inline_editor.js"></script>
 </body>
 </html>
