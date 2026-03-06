@@ -7,12 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module" src="https://js.arcgis.com/5.0/embeddable-components/"></script>
   <script>
@@ -79,33 +73,6 @@
       .float-card { animation: none; }
     }
 
-    .map-shell {
-      height: 520px;
-    }
-
-    @media (max-width: 768px) {
-      .map-shell {
-        height: 420px;
-      }
-    }
-
-    .leaflet-container {
-      font-family: "Manrope", system-ui, sans-serif;
-    }
-
-    .leaflet-tooltip {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      color: #1f2937;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
-      border-radius: 6px;
-      padding: 6px 10px;
-    }
-
-    .leaflet-tooltip:before {
-      border-top-color: #ffffff;
-    }
-
     .timeline-shell {
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -134,11 +101,6 @@
 <body class="min-h-screen">
   <div id="root"></div>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -235,11 +197,6 @@
         color: "border-amber-200 bg-amber-50",
       },
       {
-        name: "Leaflet",
-        reason: "Interactive map rendering with hover tooltips.",
-        color: "border-orange-200 bg-orange-50",
-      },
-      {
         name: "TimelineJS",
         reason: "Embedded historical narrative using Knight Lab's hosted timeline component.",
         color: "border-rose-200 bg-rose-50",
@@ -287,113 +244,6 @@
       const sectionIds = useMemo(() => navItems.map((item) => item.id), []);
       const progress = useScrollProgress();
       const active = useActiveSection(sectionIds);
-      const [hoverInfo, setHoverInfo] = useState(null);
-
-      const formatNumber = (value, digits = 0) => {
-        if (value === null || value === undefined || Number.isNaN(value)) return "-";
-        return Number(value).toLocaleString(undefined, {
-          minimumFractionDigits: digits,
-          maximumFractionDigits: digits,
-        });
-      };
-
-      const formatPct = (value) => {
-        if (value === null || value === undefined || Number.isNaN(value)) return "-";
-        return `${(Number(value) * 100).toFixed(1)}%`;
-      };
-
-      const infoRows = [
-        { key: "walk", label: "Walkability", format: (v) => formatNumber(v, 1) },
-        { key: "transit", label: "Transit access (D4A)", format: (v) => formatNumber(v, 0) },
-        { key: "carfree", label: "Car-free households", format: formatPct },
-        { key: "lowwage", label: "Low-wage share", format: formatPct },
-        {
-          key: "income",
-          label: "Median HH income",
-          format: (v) => (v === null || v === undefined ? "-" : `$${Math.round(v).toLocaleString()}`),
-        },
-        { key: "pop", label: "Population", format: (v) => formatNumber(v, 0) },
-        { key: "hisp", label: "Hispanic", format: formatPct },
-        { key: "white", label: "White (NH)", format: formatPct },
-        { key: "black", label: "Black (NH)", format: formatPct },
-        { key: "asian", label: "Asian (NH)", format: formatPct },
-        { key: "bach", label: "Bachelor's+", format: formatPct },
-        { key: "rent35", label: "Rent burden 35%+", format: formatPct },
-        { key: "u18", label: "Under 18", format: formatPct },
-        { key: "age65", label: "65+", format: formatPct },
-        {
-          key: "no_transit",
-          label: "Transit service",
-          format: (v) => (v === null || v === undefined ? "-" : v === 1 ? "No service" : "Service"),
-        },
-      ];
-
-      useEffect(() => {
-        const mapEl = document.getElementById("la-map");
-        if (!mapEl || mapEl._leaflet_id) return;
-        const map = L.map(mapEl, {
-          scrollWheelZoom: false,
-          preferCanvas: true,
-        }).setView([34.05, -118.25], 9);
-
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-          attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-        }).addTo(map);
-
-        const getColor = (value) => {
-          if (value >= 18) return "#ea580c";
-          if (value >= 16) return "#f97316";
-          if (value >= 14) return "#fb923c";
-          if (value >= 12) return "#fdba74";
-          if (value >= 10) return "#fed7aa";
-          return "#ffedd5";
-        };
-
-        const style = (feature) => ({
-          color: "#ffffff",
-          weight: 0.3,
-          fillColor: getColor(feature.properties.walk),
-          fillOpacity: 0.85,
-        });
-
-        let geoLayer = null;
-
-        fetch("data/la_walkability.geojson")
-          .then((res) => res.json())
-          .then((data) => {
-            geoLayer = L.geoJSON(data, {
-              style,
-              renderer: L.canvas({ padding: 0.5 }),
-              onEachFeature: (feature, layer) => {
-                layer.on({
-                  mouseover: (event) => {
-                    const target = event.target;
-                    target.setStyle({ weight: 1.1, color: "#0f172a", fillOpacity: 0.95 });
-                    target.bringToFront();
-                    setHoverInfo(feature.properties);
-                  },
-                  mouseout: (event) => {
-                    geoLayer.resetStyle(event.target);
-                  },
-                  click: (event) => {
-                    map.fitBounds(event.target.getBounds(), { padding: [12, 12] });
-                  },
-                });
-                const value = feature.properties.walk;
-                layer.bindTooltip(
-                  `Walkability: ${value === null || value === undefined ? "-" : value.toFixed(1)}`,
-                  { sticky: true, direction: "top" }
-                );
-              },
-            }).addTo(map);
-            map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
-          });
-
-        return () => {
-          map.remove();
-        };
-      }, []);
-
       return (
         <div className="min-h-screen">
           <div
@@ -862,45 +712,9 @@
                 <div className="text-xs uppercase tracking-[0.2em] text-slate-400">LA County</div>
               </div>
               <p className="mt-3 text-slate-600 max-w-3xl">
-                Hover any block group to see walkability, transit access, and neighborhood context. Click a block group
-                to zoom and explore local patterns.
+                We removed the earlier custom orange choropleth and now use the hosted ArcGIS map as the project’s
+                main interactive geography layer.
               </p>
-              <div className="mt-6 grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white border border-slate-200 rounded p-4 shadow-soft">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="uppercase tracking-[0.2em]">NatWalkInd</span>
-                    <span>Low &rarr; High</span>
-                  </div>
-                  <div className="mt-2 h-2 rounded-md bg-gradient-to-r from-orange-100 via-orange-300 to-orange-600"></div>
-                  <div className="mt-4 map-shell rounded-md overflow-hidden border border-slate-200" id="la-map"></div>
-                  <div className="mt-3 text-xs text-slate-500">
-                    Data source: EPA Smart Location Database (2019), LA County block groups.
-                  </div>
-                </div>
-                <div className="bg-white border border-slate-200 rounded p-5 shadow-soft">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Hover Details</div>
-                  {hoverInfo ? (
-                    <div>
-                      <div className="mt-2 text-sm text-slate-600">Block group GEOID</div>
-                      <div className="font-display text-lg">{hoverInfo.geoid}</div>
-                      <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                        {infoRows.map((row) => (
-                          <div key={row.key} className="border border-slate-200 rounded p-2 bg-slate-50">
-                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{row.label}</div>
-                            <div className="font-display text-base text-ink">
-                              {row.format(hoverInfo[row.key])}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="mt-3 text-sm text-slate-600">
-                      Hover over a block group to see the full profile.
-                    </p>
-                  )}
-                </div>
-              </div>
               <div className="mt-6 bg-white border border-slate-200 rounded p-4 shadow-soft">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
@@ -1142,7 +956,7 @@
           <footer className="border-t border-slate-200 bg-white/80 backdrop-blur">
             <div className="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
               <span>Walkability in LA County - Project site</span>
-              <span>Built with React, Tailwind CSS, Leaflet, and TimelineJS</span>
+              <span>Built with React, Tailwind CSS, ArcGIS, and TimelineJS</span>
             </div>
           </footer>
         </div>
