@@ -29,8 +29,8 @@
     focusedId: null,
     saveVersion: 0,
     lastAppliedRemoteAt: 0,
-    supabase: null,
-    channel: null,
+    lastRemoteSignature: "",
+    pollTimer: null,
     config: null,
   };
 
@@ -93,6 +93,20 @@
 
   function escapeFilterValue(value) {
     return String(value).replaceAll(",", "\\,");
+  }
+
+  function restTableUrl() {
+    return `${state.config.url.replace(/\/$/, "")}/rest/v1/${state.config.table}`;
+  }
+
+  function restHeaders(extra) {
+    return Object.assign(
+      {
+        apikey: state.config.anonKey,
+        Authorization: `Bearer ${state.config.anonKey}`,
+      },
+      extra || {}
+    );
   }
 
   function collectBlocks() {
@@ -220,7 +234,7 @@
   }
 
   async function upsertRemoteBlocks(blocks) {
-    if (!state.supabase || !state.config) return;
+    if (!state.config) return;
     const rows = Object.entries(blocks).map(([blockId, html]) => ({
       path: pagePath(),
       block_id: blockId,
@@ -229,10 +243,59 @@
       updated_at: new Date().toISOString(),
     }));
     if (!rows.length) return;
-    const { error } = await state.supabase
-      .from(state.config.table)
-      .upsert(rows, { onConflict: "path,block_id" });
-    if (error) throw error;
+    const response = await fetch(restTableUrl(), {
+      method: "POST",
+      headers: restHeaders({
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=representation",
+      }),
+      body: JSON.stringify(rows),
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Supabase upsert failed: ${response.status} ${body}`);
+    }
+  }
+
+  async function fetchRemoteRows() {
+    if (!state.config) return [];
+    const select = encodeURIComponent("block_id,html,updated_at,client_id");
+    const pathFilter = encodeURIComponent(`eq.${pagePath()}`);
+    const order = encodeURIComponent("updated_at.asc");
+    const url = `${restTableUrl()}?select=${select}&path=${pathFilter}&order=${order}`;
+    const response = await fetch(url, {
+      headers: restHeaders(),
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Supabase select failed: ${response.status} ${body}`);
+    }
+    return response.json();
+  }
+
+  function rowsSignature(rows) {
+    return JSON.stringify(
+      (rows || []).map((row) => [row.block_id, row.html, row.updated_at || "", row.client_id || ""])
+    );
+  }
+
+  function applyRemoteRows(rows, options) {
+    const remoteBlocks = {};
+    (rows || []).forEach((row) => {
+      remoteBlocks[row.block_id] = row.html;
+    });
+    const opts = options || {};
+    if (Object.keys(remoteBlocks).length) {
+      state.blocks = remoteBlocks;
+      persistLocal(remoteBlocks);
+      applyBlocksToDom(remoteBlocks, { skipFocused: opts.skipFocused !== false });
+      hydratePage();
+      return;
+    }
+    if (opts.allowEmpty) {
+      state.blocks = {};
+      persistLocal({});
+    }
   }
 
   async function flushSave() {
@@ -464,30 +527,9 @@
     }
 
     try {
-      const moduleUrl = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-      const { createClient } = await import(moduleUrl);
-      state.supabase = createClient(state.config.url, state.config.anonKey, {
-        auth: { persistSession: false, autoRefreshToken: false },
-      });
-
-      const { data, error } = await state.supabase
-        .from(state.config.table)
-        .select("block_id, html, updated_at, client_id")
-        .eq("path", pagePath());
-
-      if (error) throw error;
-
-      const remoteBlocks = {};
-      (data || []).forEach((row) => {
-        remoteBlocks[row.block_id] = row.html;
-      });
-
-      if (Object.keys(remoteBlocks).length) {
-        state.blocks = remoteBlocks;
-        persistLocal(remoteBlocks);
-        applyBlocksToDom(remoteBlocks, { skipFocused: false });
-        hydratePage();
-      }
+      const rows = await fetchRemoteRows();
+      state.lastRemoteSignature = rowsSignature(rows);
+      applyRemoteRows(rows, { skipFocused: false, allowEmpty: false });
 
       state.mode = "supabase";
       state.remoteReady = true;
@@ -496,33 +538,21 @@
       setStatus("Connected to Supabase live editing");
 
       if (state.config.realtime) {
-        const filter = `path=eq.${escapeFilterValue(pagePath())}`;
-        state.channel = state.supabase
-          .channel(`inline-editor:${pagePath()}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "*",
-              schema: state.config.schema,
-              table: state.config.table,
-              filter,
-            },
-            (payload) => {
-              const row = payload && payload.new ? payload.new : null;
-              if (!row || !row.block_id) return;
-              if (row.client_id && row.client_id === state.clientId) return;
+        window.clearInterval(state.pollTimer);
+        state.pollTimer = window.setInterval(async () => {
+          try {
+            const latestRows = await fetchRemoteRows();
+            const signature = rowsSignature(latestRows);
+            if (signature !== state.lastRemoteSignature) {
+              state.lastRemoteSignature = signature;
               state.lastAppliedRemoteAt = Date.now();
-              state.blocks[row.block_id] = row.html;
-              persistLocal(state.blocks);
-              applyBlocksToDom({ [row.block_id]: row.html }, { skipFocused: true });
+              applyRemoteRows(latestRows, { skipFocused: true, allowEmpty: true });
               setStatus("Remote edit received");
             }
-          )
-          .subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              setStatus("Supabase realtime connected");
-            }
-          });
+          } catch (error) {
+            console.error("inline editor: Supabase poll failed", error);
+          }
+        }, 1500);
       }
     } catch (error) {
       console.error("inline editor: Supabase init failed", error);
